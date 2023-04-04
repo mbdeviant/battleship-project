@@ -1,3 +1,49 @@
 * {
     background-color: wheat;
+    margin: 0;
+}
+.ship-option-container {
+    width: 750px;
+    height: 100px;
+    margin: 45px 0;
+    display: flex;
+    align-items: center;
+    background-color: gold;
+}
+.destroyer {
+    background-color: tomato;
+}
+.submarine {
+    background-color: red;
+}
+.cruiser {
+    background-color: green;
+}
+.battleship {
+    background-color: blue;
+}
+.carrier {
+    background-color: purple;
+}
+.destroyer-preview {
+    width: 30px;
+    height: 15px;
+    margin: 5px;
+}
+.submarine-preview,
+.cruiser-preview {
+    width: 45px;
+    height: 15px;
+    margin: 5px;
+}
+
+.battleship-preview {
+    width: 60px;
+    height: 15px;
+    margin: 5px;
+}
+.carrier-preview {
+    width: 75px;
+    height: 15px;
+    margin: 5px;
 }
