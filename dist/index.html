@@ -6,7 +6,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <script src="main.js" defer></script>
         <link rel="stylesheet" href="style.css" />
-        <title>Document</title>
+        <title>Battleship</title>
     </head>
-    <body></body>
+    <body>
+        <div id="game-info">
+            <p>Turn: <span id="turn-display"></span></p>
+            <p>Info: <span id="info-display"></span></p>
+        </div>
+
+        <div id="gameboard-container"></div>
+
+        <div class="ship-option-container">
+            <div class="destroyer destroyer-preview" draggable="true"></div>
+            <div class="submarine submarine-preview" draggable="true"></div>
+            <div class="cruiser cruiser-preview" draggable="true"></div>
+            <div class="battleship battleship-preview" draggable="true"></div>
+            <div class="carrier carrier-preview" draggable="true"></div>
+        </div>
+
+        <button id="flip-button">FLIP</button>
+        <button id="start-button">START</button>
+    </body>
 </html>
