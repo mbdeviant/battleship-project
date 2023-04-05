@@ -1,14 +1,40 @@
 * {
-    background-color: wheat;
+    background-color: azure;
     margin: 0;
 }
-.ship-option-container {
+button:hover {
+    cursor: pointer;
+}
+#gameboard-container {
     width: 750px;
-    height: 100px;
+    display: flex;
+    justify-content: space-between;
+}
+.gameboard {
+    width: 250px;
+    height: 250px;
+    display: flex;
+    flex-wrap: wrap;
+}
+.block {
+    width: 25px;
+    height: 25px;
+    background-color: transparent;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+#game-info {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.ship-select-container {
+    width: 750px;
+    height: 150px;
     margin: 45px 0;
     display: flex;
     align-items: center;
-    background-color: gold;
+    background-color: aqua;
 }
 .destroyer {
     background-color: tomato;
@@ -26,24 +52,28 @@
     background-color: purple;
 }
 .destroyer-preview {
-    width: 30px;
-    height: 15px;
+    width: 50px;
+    height: 25px;
     margin: 5px;
+    border-radius: 7px;
 }
 .submarine-preview,
 .cruiser-preview {
-    width: 45px;
-    height: 15px;
+    width: 75px;
+    height: 25px;
     margin: 5px;
+    border-radius: 7px;
 }
 
 .battleship-preview {
-    width: 60px;
-    height: 15px;
+    width: 100px;
+    height: 25px;
     margin: 5px;
+    border-radius: 7px;
 }
 .carrier-preview {
-    width: 75px;
-    height: 15px;
+    width: 125px;
+    height: 25px;
     margin: 5px;
+    border-radius: 7px;
 }
