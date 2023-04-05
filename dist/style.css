@@ -1,6 +1,7 @@
 * {
     background-color: azure;
     margin: 0;
+    padding: 2px;
 }
 button:hover {
     cursor: pointer;
@@ -55,25 +56,25 @@ button:hover {
     width: 50px;
     height: 25px;
     margin: 5px;
-    border-radius: 7px;
+    border-radius: 2px;
 }
 .submarine-preview,
 .cruiser-preview {
     width: 75px;
     height: 25px;
     margin: 5px;
-    border-radius: 7px;
+    border-radius: 2px;
 }
 
 .battleship-preview {
     width: 100px;
     height: 25px;
     margin: 5px;
-    border-radius: 7px;
+    border-radius: 2px;
 }
 .carrier-preview {
     width: 125px;
     height: 25px;
     margin: 5px;
-    border-radius: 7px;
+    border-radius: 2px;
 }
