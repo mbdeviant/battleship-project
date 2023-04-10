@@ -59,6 +59,13 @@ button:hover {
 .carrier {
     background-color: purple;
 }
+#computer .destroyer,
+#computer .submarine,
+#computer .cruiser,
+#computer .battleship,
+#computer .carrier {
+    background-color: transparent;
+}
 .destroyer-preview {
     width: 50px;
     height: 25px;
@@ -89,8 +96,8 @@ button:hover {
     background-color: gray;
 }
 .hit {
-    background-color: red;
+    background-color: red !important;
 }
 .miss {
-    background-color: gray;
+    background-color: gray !important;
 }
