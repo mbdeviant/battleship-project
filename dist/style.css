@@ -25,7 +25,7 @@ button:hover {
 .block {
     width: 25px;
     height: 25px;
-    background-color: transparent;
+    background-color: gold;
     /* border: 1px dotted black; */
     box-shadow: 0 0 1px black;
     box-sizing: border-box;
