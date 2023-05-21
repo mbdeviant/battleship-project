@@ -1,6 +1,5 @@
 const path = require("path");
 // eslint-disable-next-line import/no-extraneous-dependencies
-const nodeExternals = require("webpack-node-externals");
 
 module.exports = {
   mode: "development",
@@ -9,6 +8,12 @@ module.exports = {
     filename: "main.js",
     path: path.resolve(__dirname, "dist"),
   },
-  externals: [nodeExternals()],
+  target: "node",
+  externals: {
+    bufferutil: "bufferutil",
+    "utf-8-validate": "utf-8-validate",
+    "socket.io": "commonjs socket.io",
+  },
+
   devtool: "inline-source-map",
 };
