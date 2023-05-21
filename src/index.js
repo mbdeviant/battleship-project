@@ -1,8 +1,12 @@
-// MARK FOR UI ELEMENTS, MAKE THEM SEPERATE MODULE
+/* eslint-disable import/no-extraneous-dependencies */
 
+// MARK FOR UI ELEMENTS, MAKE THEM SEPERATE MODULE
 // BUTTON LOGIC
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
+
+// eslint-disable-next-line no-undef
+const socket = io();
 
 flipButton.addEventListener("click", flipShips);
 
