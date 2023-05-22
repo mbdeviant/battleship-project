@@ -1,5 +1,3 @@
-/* eslint-disable import/newline-after-import */
-/* eslint-disable import/no-extraneous-dependencies */
 const express = require("express");
 const path = require("path");
 const http = require("http");
@@ -17,11 +15,18 @@ server.listen(PORT, () =>
   console.log(`server is running on localhost:${PORT}`)
 );
 
+const connections = [null, null];
 io.on("connection", (socket) => {
-  console.log("A user connected");
-  socket.on("disconnect", () => {
-    console.log("A user disconnected");
-  });
+  let playerIndex = -1;
+  for (const i in connections) {
+    if (connections[i] == null) {
+      playerIndex = i;
+      break;
+    }
+  }
+  socket.emit("player-number", playerIndex);
+  console.log(`player ${playerIndex} has connected`);
+  // if (playerIndex === -1) return;
 });
 
 // server.listen(3000, () => {
