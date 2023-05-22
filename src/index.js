@@ -1,12 +1,35 @@
-/* eslint-disable import/no-extraneous-dependencies */
+// multi-single player controls
+const singlePlayerButton = document.getElementById("single-player-button");
+const multiplayerButton = document.getElementById("multiplayer-button");
+// start the game
+const startButton = document.getElementById("start-button");
+const infoDisplay = document.getElementById("info-display");
+const turnDisplay = document.getElementById("turn-display");
 
-// MARK FOR UI ELEMENTS, MAKE THEM SEPERATE MODULE
 // BUTTON LOGIC
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
+let currentPLayer = "user";
+let user = currentPLayer;
+let gameMode = "";
+let playerNum = 0;
+let ready = false;
+let enemyReady = false;
+let allShipsPlaced = false;
+let shotFired = -1;
 
-// eslint-disable-next-line no-undef
 const socket = io();
+
+// get player number
+socket.on("player-number", (num) => {
+  if (num === -1) {
+    infoDisplay.innerHTML = "server is full";
+  } else {
+    playerNum = parseInt(num);
+    if (playerNum === 1) currentPLayer = "enemy";
+    console.log(playerNum);
+  }
+});
 
 flipButton.addEventListener("click", flipShips);
 
@@ -150,7 +173,6 @@ function getAdjacentIndexes(boardBlocks, isHorizontal, shipBlocks) {
   const boardBlocksArray = [...boardBlocks];
   const adjacentIndexes = [];
 
-  // eslint-disable-next-line no-unused-vars
   shipBlocks.forEach((block, index) => {
     const blockIndex = boardBlocksArray.indexOf(block);
     const row = Math.floor(blockIndex / 10);
@@ -253,9 +275,6 @@ let gameOver = false;
 let playerTurn;
 
 // start the game
-const startButton = document.getElementById("start-button");
-const infoDisplay = document.getElementById("info-display");
-const turnDisplay = document.getElementById("turn-display");
 
 function startGame() {
   if (playerTurn === undefined) {
