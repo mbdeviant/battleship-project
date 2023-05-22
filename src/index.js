@@ -9,8 +9,8 @@ const turnDisplay = document.getElementById("turn-display");
 // BUTTON LOGIC
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
-let currentPLayer = "user";
-let user = currentPLayer;
+let currentPlayer = "user";
+let user = currentPlayer;
 let gameMode = "";
 let playerNum = 0;
 let ready = false;
@@ -26,7 +26,7 @@ socket.on("player-number", (num) => {
     infoDisplay.innerHTML = "server is full";
   } else {
     playerNum = parseInt(num);
-    if (playerNum === 1) currentPLayer = "enemy";
+    if (playerNum === 1) currentPlayer = "enemy";
     console.log(playerNum);
   }
 });
