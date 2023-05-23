@@ -54,7 +54,17 @@ function startMultiplayer() {
   // player connection control
   socket.on("player-connection", (num) => {
     console.log(`player ${num} has connected`);
+    controlPlayerConnection(num);
   });
+
+  function controlPlayerConnection(num) {
+    const player = `.p${parseInt(num) + 1}`;
+    document
+      .querySelector(`${player} .connected span`)
+      .classList.toggle("green");
+    if (parseInt(num) === playerNum)
+      document.querySelector(player).style.fontWeight = "bold";
+  }
 }
 multiplayerButton.addEventListener("click", startMultiplayer);
 
