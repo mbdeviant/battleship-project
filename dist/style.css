@@ -1,103 +1,103 @@
 * {
-    background-color: azure;
-    margin: 0;
+  background-color: rgb(49, 48, 48);
+  margin: 0;
 }
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 button:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 #gameboard-container {
-    width: 750px;
-    display: flex;
-    justify-content: space-between;
+  width: 750px;
+  display: flex;
+  justify-content: space-between;
 }
 .gameboard {
-    width: 250px;
-    height: 250px;
-    display: flex;
-    flex-wrap: wrap;
-    border: 1px solid rgba(0, 0, 0, 0.3);
+  width: 250px;
+  height: 250px;
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid rgba(0, 0, 0, 0.3);
 }
 .block {
-    width: 25px;
-    height: 25px;
-    background-color: gold;
-    /* border: 1px dotted black; */
-    box-shadow: 0 0 1px black;
-    box-sizing: border-box;
+  width: 25px;
+  height: 25px;
+  background-color: gold;
+  /* border: 1px dotted black; */
+  box-shadow: 0 0 1px black;
+  box-sizing: border-box;
 }
 #game-info {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 .ship-select-container {
-    width: 750px;
-    height: 150px;
-    margin: 45px 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
+  width: 750px;
+  height: 150px;
+  margin: 45px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
 }
 .destroyer {
-    background-color: tomato;
+  background-color: tomato;
 }
 .submarine {
-    background-color: red;
+  background-color: red;
 }
 .cruiser {
-    background-color: green;
+  background-color: green;
 }
 .battleship {
-    background-color: blue;
+  background-color: blue;
 }
 .carrier {
-    background-color: purple;
+  background-color: purple;
 }
 #computer .destroyer,
 #computer .submarine,
 #computer .cruiser,
 #computer .battleship,
 #computer .carrier {
-    background-color: transparent;
+  background-color: transparent;
 }
 .destroyer-preview {
-    width: 50px;
-    height: 25px;
-    margin: 5px;
-    border-radius: 2px;
+  width: 50px;
+  height: 25px;
+  margin: 5px;
+  border-radius: 2px;
 }
 .submarine-preview,
 .cruiser-preview {
-    width: 75px;
-    height: 25px;
-    margin: 5px;
-    border-radius: 2px;
+  width: 75px;
+  height: 25px;
+  margin: 5px;
+  border-radius: 2px;
 }
 
 .battleship-preview {
-    width: 100px;
-    height: 25px;
-    margin: 5px;
-    border-radius: 2px;
+  width: 100px;
+  height: 25px;
+  margin: 5px;
+  border-radius: 2px;
 }
 .carrier-preview {
-    width: 125px;
-    height: 25px;
-    margin: 5px;
-    border-radius: 2px;
+  width: 125px;
+  height: 25px;
+  margin: 5px;
+  border-radius: 2px;
 }
 .hover {
-    background-color: gray;
+  background-color: gray;
 }
 .hit {
-    background-color: red !important;
+  background-color: red !important;
 }
 .miss {
-    background-color: gray !important;
+  background-color: gray !important;
 }
