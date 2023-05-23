@@ -25,8 +25,14 @@ io.on("connection", (socket) => {
     }
   }
   socket.emit("player-number", playerIndex);
+
   console.log(`player ${playerIndex} has connected`);
-  // if (playerIndex === -1) return;
+
+  if (playerIndex === -1) return;
+
+  connections[playerIndex] = false;
+
+  socket.broadcast.emit("player-connection", playerIndex);
 });
 
 // server.listen(3000, () => {
