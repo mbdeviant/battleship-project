@@ -32,7 +32,15 @@ io.on("connection", (socket) => {
 
   connections[playerIndex] = false;
 
+  // announce player connections
   socket.broadcast.emit("player-connection", playerIndex);
+
+  // handle disconnect
+  socket.on("disconnect", () => {
+    console.log(`player ${playerIndex} has disconnected`);
+    connections[playerIndex] = null;
+    socket.broadcast.emit("player-connection", playerIndex);
+  });
 });
 
 // server.listen(3000, () => {
