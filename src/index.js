@@ -6,7 +6,22 @@ const startButton = document.getElementById("start-button");
 const infoDisplay = document.getElementById("info-display");
 const turnDisplay = document.getElementById("turn-display");
 
-// BUTTON LOGIC
+// CREATING SHIPS
+class Ship {
+  constructor(name, length) {
+    this.name = name;
+    this.length = length;
+  }
+}
+
+const destroyer = new Ship("destroyer", 2);
+const submarine = new Ship("submarine", 3);
+const cruiser = new Ship("cruiser", 3);
+const battleship = new Ship("battleship", 4);
+const carrier = new Ship("carrier", 5);
+
+const ships = [destroyer, submarine, cruiser, battleship, carrier];
+
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
 let currentPlayer = "user";
@@ -17,21 +32,42 @@ let ready = false;
 let enemyReady = false;
 let allShipsPlaced = false;
 let shotFired = -1;
+let notDropped;
+let singlePlayerStarted;
+let multiPlayerStarted;
 
-const socket = io();
+function startMultiplayer() {
+  gameMode = "multiplayer";
 
-// get player number
-socket.on("player-number", (num) => {
-  if (num === -1) {
-    infoDisplay.innerHTML = "server is full";
-  } else {
-    playerNum = parseInt(num);
-    if (playerNum === 1) currentPlayer = "enemy";
-    console.log(playerNum);
-  }
-});
+  const socket = io();
 
-flipButton.addEventListener("click", flipShips);
+  // get player number
+  socket.on("player-number", (num) => {
+    if (num === -1) {
+      infoDisplay.innerHTML = "server is full";
+    } else {
+      playerNum = parseInt(num);
+      if (playerNum === 1) currentPlayer = "enemy";
+      console.log(playerNum);
+    }
+  });
+  // player connection control
+  socket.on("player-connection", (num) => {
+    console.log(`player ${num} has connected`);
+  });
+}
+multiplayerButton.addEventListener("click", startMultiplayer);
+
+// start single player game
+function startSinglePlayer() {
+  if (singlePlayerStarted === true) return;
+  singlePlayerStarted = true;
+  gameMode = "singleplayer";
+  user = "computer";
+  ships.forEach((ship) => addShip("computer", ship));
+  startButton.addEventListener("click", startGameSingle);
+}
+singlePlayerButton.addEventListener("click", startSinglePlayer);
 
 let angle = 0;
 function flipShips() {
@@ -42,6 +78,7 @@ function flipShips() {
     ship.style.transform = `rotate(${angle}deg)`;
   });
 }
+flipButton.addEventListener("click", flipShips);
 
 // CREATING GAMEBOARD
 function createBoard(color, user) {
@@ -65,22 +102,6 @@ function createBoard(color, user) {
 createBoard("white", "player");
 createBoard("gainsboro", "computer");
 
-// CREATING SHIPS
-class Ship {
-  constructor(name, length) {
-    this.name = name;
-    this.length = length;
-  }
-}
-
-const destroyer = new Ship("destroyer", 2);
-const submarine = new Ship("submarine", 3);
-const cruiser = new Ship("cruiser", 3);
-const battleship = new Ship("battleship", 4);
-const carrier = new Ship("carrier", 5);
-
-const ships = [destroyer, submarine, cruiser, battleship, carrier];
-let notDropped;
 // console.log(ships);
 
 function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
@@ -208,7 +229,6 @@ function getAdjacentIndexes(boardBlocks, isHorizontal, shipBlocks) {
 // addShip(cruiser);
 // addShip(battleship);
 // addShip("computer", carrier);
-ships.forEach((ship) => addShip("computer", ship));
 
 // DRAG&DROP PLAYER SHIPS
 let draggedShip;
@@ -276,7 +296,7 @@ let playerTurn;
 
 // start the game
 
-function startGame() {
+function startGameSingle() {
   if (playerTurn === undefined) {
     if (shipContainer.children.length !== 0) {
       infoDisplay.textContent = "Please place all your ships first!";
@@ -291,7 +311,6 @@ function startGame() {
     }
   }
 }
-startButton.addEventListener("click", startGame);
 
 let playerHits = [];
 let computerHits = [];
@@ -394,10 +413,12 @@ function checkScore(user, userHits, userSunkShips) {
     infoDisplay.textContent =
       "You sunk all the enemy ships! Well fought admiral!";
     gameOver = true;
+    startButton.removeEventListener("click", startGameSingle);
   }
   if (computerSunkShips.length === 5) {
     infoDisplay.textContent =
       "Your fleet has been destroyed! Well fought admiral, we'll get them next time.";
     gameOver = true;
+    startButton.removeEventListener("click", startGameSingle);
   }
 }
