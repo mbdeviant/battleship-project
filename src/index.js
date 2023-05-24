@@ -50,6 +50,8 @@ function startMultiplayer() {
       playerNum = parseInt(num);
       if (playerNum === 1) currentPlayer = "enemy";
       console.log(playerNum);
+
+      socket.emit("check-players");
     }
   });
   // player connection control
@@ -63,6 +65,17 @@ function startMultiplayer() {
     enemyReady = true;
     playerReady(num);
     if (ready) startGameMulti(socket);
+  });
+
+  // check player status
+  socket.on("check-players", (players) => {
+    players.forEach((player, index) => {
+      if (player.connected) controlPlayerConnection(index);
+      if (player.ready) {
+        playerReady(index);
+        if (index !== playerNum) enemyReady = true;
+      }
+    });
   });
 
   startButton.addEventListener("click", () => {
@@ -316,7 +329,6 @@ function dropShip(e) {
   addShip("player", ship, startId);
   if (!notDropped) draggedShip.remove();
   if (!shipContainer.querySelector(".ship")) allShipsPlaced = true;
-  vg;
   draggedShip = null;
 }
 
