@@ -41,8 +41,9 @@ io.on("connection", (socket) => {
     connections[playerIndex] = null;
     socket.broadcast.emit("player-connection", playerIndex);
   });
-});
 
-// server.listen(3000, () => {
-//   console.log("Server is running on http://localhost:3000");
-// });
+  socket.on("player-ready", () => {
+    socket.broadcast.emit("enemy-ready", playerIndex);
+    connections[playerIndex] = true;
+  });
+});
