@@ -29,6 +29,7 @@ let user = currentPlayer;
 let gameMode = "";
 let playerNum = 0;
 let ready = false;
+let gameOver = false;
 let enemyReady = false;
 let allShipsPlaced = false;
 let shotFired = -1;
@@ -57,6 +58,18 @@ function startMultiplayer() {
     controlPlayerConnection(num);
   });
 
+  // enemy ready
+  socket.on("enemy-ready", (num) => {
+    enemyReady = true;
+    playerReady(num);
+    if (ready) startGameMulti(socket);
+  });
+
+  startButton.addEventListener("click", () => {
+    if (allShipsPlaced) startGameMulti(socket);
+    else infoDisplay.innerHTML = "place all of your ships first!";
+  });
+
   function controlPlayerConnection(num) {
     const player = `.p${parseInt(num) + 1}`;
     document
@@ -68,8 +81,33 @@ function startMultiplayer() {
 }
 multiplayerButton.addEventListener("click", startMultiplayer);
 
+// start multiplayer game
+function startGameMulti(socket) {
+  if (gameOver) return;
+  if (!ready) {
+    socket.emit("player-ready");
+    ready = true;
+    playerReady(playerNum);
+  }
+
+  if (enemyReady) {
+    if (currentPlayer === "user") {
+      turnDisplay.innerHTML = "your turn";
+    }
+    if (currentPlayer === "enemy") {
+      turnDisplay.innerHTML("enemy's turn");
+    }
+  }
+}
+
+function playerReady(num) {
+  const player = `.p${parseInt(num) + 1}`;
+  document.querySelector(`${player} .ready span`).classList.toggle("green");
+}
+
 // start single player game
 function startSinglePlayer() {
+  if (gameOver) return;
   if (singlePlayerStarted === true) return;
   singlePlayerStarted = true;
   gameMode = "singleplayer";
@@ -277,7 +315,8 @@ function dropShip(e) {
 
   addShip("player", ship, startId);
   if (!notDropped) draggedShip.remove();
-
+  if (!shipContainer.querySelector(".ship")) allShipsPlaced = true;
+  vg;
   draggedShip = null;
 }
 
@@ -301,7 +340,6 @@ function highlightShipArea(startIndex, ship) {
 
 // GAME LOGIC
 
-let gameOver = false;
 let playerTurn;
 
 // start the game
