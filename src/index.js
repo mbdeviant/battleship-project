@@ -83,6 +83,19 @@ function startMultiplayer() {
     else infoDisplay.innerHTML = "place all of your ships first!";
   });
 
+  // event listener for firing
+  const boardBlocks = document.querySelectorAll("#computer div");
+  boardBlocks.forEach((block) => {
+    block.addEventListener(click, () => {
+      if (currentPlayer === "user" && ready && enemyReady) {
+        shotFired = block.id;
+        socket.emit("fire", shotFired);
+      }
+    });
+  });
+
+  // receiving fire
+
   function controlPlayerConnection(num) {
     const player = `.p${parseInt(num) + 1}`;
     document
@@ -201,7 +214,9 @@ function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
   }
   // console.log(`is valid? ${isValid}`);
   const notTaken = shipBlocks.every(
-    (block) => !block.classList.contains("filled")
+    (block) =>
+      !block.classList.contains("filled") &&
+      !block.classList.contains("unavailable")
   );
 
   return { shipBlocks, isValid, notTaken };
@@ -241,7 +256,7 @@ function addShip(user, ship, startId) {
     );
     adjacentIndexes.forEach((adjacentIndex) => {
       const adjacentBlock = boardBlocks[adjacentIndex];
-      adjacentBlock.classList.add("filled");
+      adjacentBlock.classList.add("unavailable");
     });
     console.log(adjacentIndexes);
   } else {
@@ -397,7 +412,7 @@ function handleClick(e) {
     boardBlocks.forEach(
       (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
     );
-    setTimeout(computersTurn, 500);
+    setTimeout(computersTurn, 100);
   }
 }
 
@@ -411,7 +426,8 @@ function computersTurn() {
       const randomShot = Math.floor(Math.random() * 10 * 10);
       if (
         playerBoard[randomShot].classList.contains("filled") &&
-        playerBoard[randomShot].classList.contains("hit")
+        playerBoard[randomShot].classList.contains("hit") &&
+        playerBoard[randomShot].classList.contains("miss")
       ) {
         computersTurn();
       } else if (
