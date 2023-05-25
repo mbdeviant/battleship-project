@@ -56,4 +56,10 @@ io.on("connection", (socket) => {
     }
     socket.emit("check-players", players);
   });
+
+  socket.on("fire", (id) => {
+    console.log(`shot fired from ${playerIndex}`, id);
+
+    socket.broadcast.emit("fire", id);
+  });
 });
