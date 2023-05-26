@@ -62,4 +62,11 @@ io.on("connection", (socket) => {
 
     socket.broadcast.emit("fire", id);
   });
+
+  socket.on("fire-reply", (block) => {
+    console.log(block);
+
+    // forward it to other player
+    socket.broadcast.emit("fire-reply", block);
+  });
 });
