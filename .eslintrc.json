@@ -10,6 +10,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "consistent-return": "off",
     "no-unused-expressions": "off",
     "guard-for-in": "off",
     "no-shadow": "off",
