@@ -24,8 +24,8 @@ const ships = [destroyer, submarine, cruiser, battleship, carrier];
 
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
-let currentPlayer = "user";
-let user = currentPlayer;
+let user = "player";
+
 let gameMode = "";
 let playerNum = 0;
 let ready = false;
@@ -87,7 +87,7 @@ function startMultiplayer() {
   const boardBlocks = document.querySelectorAll("#computer div");
   boardBlocks.forEach((block) => {
     block.addEventListener(click, () => {
-      if (currentPlayer === "user" && ready && enemyReady) {
+      if (currentPlayer === "player" && ready && enemyReady) {
         shotFired = block.id;
         socket.emit("fire", shotFired);
       }
@@ -173,7 +173,7 @@ function createBoard(color, user) {
   gameBoardContainer.appendChild(gameBoard);
 }
 
-createBoard("white", "player");
+createBoard("white", user);
 createBoard("gainsboro", "computer");
 
 // console.log(ships);
@@ -258,7 +258,7 @@ function addShip(user, ship, startId) {
       const adjacentBlock = boardBlocks[adjacentIndex];
       adjacentBlock.classList.add("unavailable");
     });
-    console.log(adjacentIndexes);
+    // console.log(adjacentIndexes);
   } else {
     if (user === "computer") addShip(user, ship, startId);
     if (user === "player") notDropped = true;
@@ -339,7 +339,7 @@ function dropShip(e) {
   const startId = e.target.id;
   if (draggedShip === undefined || draggedShip === null) return;
   const ship = ships[draggedShip.id];
-  console.log(ship, "this is ship");
+  // console.log(ship, "this is ship");
 
   addShip("player", ship, startId);
   if (!notDropped) draggedShip.remove();
@@ -388,32 +388,48 @@ function startGameSingle() {
 }
 
 let playerHits = [];
+let enemyHits = [];
 let computerHits = [];
 const playerSunkShips = [];
+const enemySunkShips = [];
 const computerSunkShips = [];
 
 function handleClick(e) {
   if (!gameOver) {
+    if (e.target.classList.contains("hit")) return; // do this better
     if (e.target.classList.contains("filled")) {
       e.target.classList.add("hit");
       infoDisplay.textContent = "You hit the enemy ship!";
       const classes = Array.from(e.target.classList).filter(
-        (name) => !["block", "hit", "filled"].includes(name)
+        (name) => !["block", "hit", "filled", "unavailable"].includes(name)
       );
-      playerHits.push(...classes);
-      checkScore("player", playerHits, playerSunkShips);
+
+      if (user === "player" || gameMode === "singleplayer") {
+        playerHits.push(...classes);
+        checkScore(user, playerHits, playerSunkShips);
+      }
+
+      if (user === "enemy") {
+        enemyHits.push(...classes);
+        checkScore(user, enemyHits, enemySunkShips);
+      }
     }
     if (!e.target.classList.contains("filled")) {
       infoDisplay.textContent = "Miss!";
       e.target.classList.add("miss");
     }
-    playerTurn = false;
+
     const boardBlocks = document.querySelectorAll("#computer div");
     boardBlocks.forEach(
       (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
     );
-    setTimeout(computersTurn, 100);
+    // if gamemode is single, do these?
+    if (gameMode === "singleplayer") {
+      playerTurn = false;
+      setTimeout(computersTurn, 100);
+    }
   }
+  return e.target.id; // use this to communicate with server?
 }
 
 // computers turn
@@ -452,12 +468,13 @@ function computersTurn() {
       turnDisplay.textContent = "Player's turn";
       infoDisplay.textContent = "Take your shot!";
 
-      const boardBlocks = document.querySelectorAll("#computer div");
-      boardBlocks.forEach((block) =>
-        block.addEventListener("click", handleClick)
-      ); // re-adding event listeners
+      handleEventListeners(); // re-adding event listeners
     }, 500);
   }
+}
+function handleEventListeners() {
+  const boardBlocks = document.querySelectorAll("#computer div");
+  boardBlocks.forEach((block) => block.addEventListener("click", handleClick)); // re-adding event listeners
 }
 
 function checkScore(user, userHits, userSunkShips) {
@@ -465,10 +482,13 @@ function checkScore(user, userHits, userSunkShips) {
     if (
       userHits.filter((hitShip) => hitShip === shipName).length === shipLength
     ) {
-      if (user === "player") {
+      if (user === "player" || gameMode === "singleplayer") {
         infoDisplay.textContent = `You sunk the enemy ${shipName}!`;
 
         playerHits = userHits.filter((hitShip) => hitShip !== shipName);
+      }
+      if (user === "enemy") {
+        enemyHits = userHits.filter((hitShip) => hitShip !== shipName);
       }
       if (user === "computer") {
         infoDisplay.textContent = `The enemy sunk your ${shipName}!`;
@@ -487,9 +507,15 @@ function checkScore(user, userHits, userSunkShips) {
 
   if (playerSunkShips.length === 5) {
     infoDisplay.textContent =
-      "You sunk all the enemy ships! Well fought admiral!";
+      "You sunk all the enemy ships! Well fought admiral!"; // game over player 1 won
     gameOver = true;
-    startButton.removeEventListener("click", startGameSingle);
+    if (gameMode === "singleplayer")
+      startButton.removeEventListener("click", startGameSingle);
+  }
+  if (enemySunkShips.lenght === 5) {
+    infoDisplay.textContent =
+      "You sunk all the enemy ships! Well fought admiral!"; // game over player 1 won
+    gameOver = true;
   }
   if (computerSunkShips.length === 5) {
     infoDisplay.textContent =
