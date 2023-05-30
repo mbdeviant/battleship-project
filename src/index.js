@@ -25,7 +25,7 @@ const ships = [destroyer, submarine, cruiser, battleship, carrier];
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
 let user = "player";
-
+let currentPlayer = user;
 let gameMode = "";
 let playerNum = 0;
 let ready = false;
@@ -79,19 +79,38 @@ function startMultiplayer() {
   });
 
   startButton.addEventListener("click", () => {
+    if (!allShipsPlaced) return;
     if (allShipsPlaced) startGameMulti(socket);
     else infoDisplay.innerHTML = "place all of your ships first!";
+    // const boardBlocks = document.querySelectorAll("#computer div");
   });
 
   // event listener for firing
+
   const boardBlocks = document.querySelectorAll("#computer div");
   boardBlocks.forEach((block) => {
-    block.addEventListener(click, () => {
+    block.addEventListener("click", (e) => {
       if (currentPlayer === "player" && ready && enemyReady) {
-        shotFired = block.id;
+        shotFired = handleClick(e);
+        console.log(shotFired);
+
         socket.emit("fire", shotFired);
       }
     });
+  });
+
+  socket.on("start-game", (player1BoardData, player2BoardData) => {
+    const opponentBoardBlocks = document.querySelectorAll("#computer div");
+
+    const indexOffset = playerNum === 0 ? 0 : 10;
+
+    for (let i = 0; i < opponentBoardBlocks.length; i += 1) {
+      const dataIndex = i + indexOffset;
+      opponentBoardBlocks[i].className =
+        playerNum === 0
+          ? player2BoardData[dataIndex]
+          : player1BoardData[dataIndex];
+    }
   });
 
   // receiving fire
@@ -110,6 +129,7 @@ multiplayerButton.addEventListener("click", startMultiplayer);
 // start multiplayer game
 function startGameMulti(socket) {
   if (gameOver) return;
+  console.log(currentPlayer);
   if (!ready) {
     socket.emit("player-ready");
     ready = true;
@@ -117,12 +137,20 @@ function startGameMulti(socket) {
   }
 
   if (enemyReady) {
-    if (currentPlayer === "user") {
+    if (currentPlayer === "player") {
       turnDisplay.innerHTML = "your turn";
     }
     if (currentPlayer === "enemy") {
-      turnDisplay.innerHTML("enemy's turn");
+      turnDisplay.innerHTML = "enemy's turn";
     }
+
+    // const playerBoardData = Array.from(
+    //   document.querySelectorAll("#player div")
+    // ).map((block) => (block.classList.contains("filled") ? "filled" : "block"));
+    const playerBoardData = Array.from(
+      document.querySelectorAll("#player div")
+    ).map((block) => block.className);
+    socket.emit("board-data", playerBoardData);
   }
 }
 
@@ -395,6 +423,7 @@ const enemySunkShips = [];
 const computerSunkShips = [];
 
 function handleClick(e) {
+  console.log(currentPlayer);
   if (!gameOver) {
     if (e.target.classList.contains("hit")) return; // do this better
     if (e.target.classList.contains("filled")) {
@@ -403,15 +432,15 @@ function handleClick(e) {
       const classes = Array.from(e.target.classList).filter(
         (name) => !["block", "hit", "filled", "unavailable"].includes(name)
       );
-
-      if (user === "player" || gameMode === "singleplayer") {
+      // may need to use currentPlayer for events
+      if (currentPlayer === "player" || gameMode === "singleplayer") {
         playerHits.push(...classes);
-        checkScore(user, playerHits, playerSunkShips);
+        checkScore(currentPlayer, playerHits, playerSunkShips);
       }
 
-      if (user === "enemy") {
+      if (currentPlayer === "enemy") {
         enemyHits.push(...classes);
-        checkScore(user, enemyHits, enemySunkShips);
+        checkScore(currentPlayer, enemyHits, enemySunkShips);
       }
     }
     if (!e.target.classList.contains("filled")) {
