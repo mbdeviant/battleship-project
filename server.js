@@ -16,6 +16,7 @@ server.listen(PORT, () =>
 );
 
 const connections = [null, null];
+const playerBoardData = {};
 io.on("connection", (socket) => {
   let playerIndex = -1;
   for (const i in connections) {
@@ -57,9 +58,21 @@ io.on("connection", (socket) => {
     socket.emit("check-players", players);
   });
 
+  socket.on("board-data", (data) => {
+    playerBoardData[playerIndex] = data;
+
+    if (Object.keys(playerBoardData).length === 2) {
+      const player1BoardData = playerBoardData[0];
+      const player2BoardData = playerBoardData[1];
+
+      io.emit("start-game", player1BoardData, player2BoardData);
+    }
+  });
+
   socket.on("fire", (id) => {
     console.log(`shot fired from ${playerIndex}`, id);
-
+    console.log(`${playerBoardData[0]}player 0`);
+    console.log(`${playerBoardData[1]}player 1`);
     socket.broadcast.emit("fire", id);
   });
 
@@ -70,3 +83,8 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("fire-reply", block);
   });
 });
+
+// const playerBoardData = Array.from(document.querySelectorAll("#player div"))
+//     .map((block) => block.classList.contains("filled") ? 1 : 0);
+//   socket.emit("board-data", playerBoardData);
+// }
