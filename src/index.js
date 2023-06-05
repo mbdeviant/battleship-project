@@ -6,6 +6,15 @@ const startButton = document.getElementById("start-button");
 const infoDisplay = document.getElementById("info-display");
 const turnDisplay = document.getElementById("turn-display");
 
+let tmpBoardData = [];
+
+let playerHits = [];
+// let enemyHits = [];
+let computerHits = [];
+const playerSunkShips = [];
+const enemySunkShips = [];
+const computerSunkShips = [];
+
 // CREATING SHIPS
 class Ship {
   constructor(name, length) {
@@ -39,8 +48,12 @@ let singlePlayerStarted;
 let multiPlayerStarted;
 
 function startMultiplayer() {
-  gameMode = "multiplayer";
+  if (multiPlayerStarted) {
+    console.log("dont");
+    return;
+  }
   multiPlayerStarted = true;
+  gameMode = "multiplayer";
 
   const socket = io();
 
@@ -93,24 +106,36 @@ function startMultiplayer() {
   const boardBlocks = document.querySelectorAll("#computer div");
   socket.on("turn-change", (turn) => {
     turnNum = turn;
+    if (turnNum === playerNum) turnDisplay.innerHTML = "your turn";
+    else turnDisplay.innerHTML = "enemy's turn";
+  });
+  socket.on("gameover", (status) => {
+    gameOver = status;
+    if (gameOver) {
+      turnDisplay.textContent = "la oyun bitti";
+      if (playerSunkShips.length !== 5) infoDisplay.innerHTML = "you lost";
+    }
   });
   console.log(`${turnNum} ${playerNum} outside`);
   boardBlocks.forEach((block) => {
     block.addEventListener("click", (e) => {
-      // if (playerNum !== turnNum) return;
-      // if (turnNum === 1 || (turnNum === 0 && ready && enemyReady)) {
-      // }
-      // playerNum === turnNum &&
-      // if (turnNum === 1 || (turnNum === 0 && ready && enemyReady)) {
-      // }
       if (turnNum === playerNum) {
+        if (gameOver) return;
         shotFired = handleClick(e);
-        console.log(shotFired, turnNum, playerNum);
+        // if hit return causes shotFired to be null and inclues doesn't work
+        // but at least you can get the block class, or ish
+        // no you can't, something wrong with block indexes
+        // if (tmpBoardData[shotFired].includes("filled")) {
+        //   console.log("that's a hit!");
+        // }
+        console.log(tmpBoardData[shotFired]);
         turnNum = (turnNum + 1) % 2;
+
         console.log(turnNum, playerNum);
         socket.emit("turn-change", turnNum);
         socket.emit("fire", shotFired, turnNum);
-      } else infoDisplay.innerHTML = "not your turn";
+        socket.emit("gameover", gameOver);
+      } else turnDisplay.innerHTML = "not your turn";
 
       // handleTurn();
     });
@@ -149,6 +174,7 @@ function startMultiplayer() {
       document.querySelector(player).style.fontWeight = "bold";
   }
 }
+
 multiplayerButton.addEventListener("click", startMultiplayer);
 
 // start multiplayer game
@@ -169,19 +195,19 @@ function startGameMulti(socket) {
       turnDisplay.innerHTML = "enemy's turn";
     }
 
-    // const playerBoardData = Array.from(
-    //   document.querySelectorAll("#player div")
-    // ).map((block) => (block.classList.contains("filled") ? "filled" : "block"));
     const playerBoardData = Array.from(
       document.querySelectorAll("#player div")
     ).map((block) => block.className);
     socket.emit("board-data", playerBoardData);
+    tmpBoardData = playerBoardData;
   }
 }
-
-function handleTurn() {
-  if (turnNum === 0) currentPlayer = "player";
-  if (turnNum === 1) currentPlayer = "enemy";
+function handleGameover() {
+  // check for current player sunk ship list and
+  // if it's 5, then current player won
+  // if not, enemy won
+  if (playerSunkShips.length === 5) infoDisplay.innerHTML = "you won";
+  else infoDisplay.innerHTML = "you lost";
 }
 
 function playerReady(num) {
@@ -358,11 +384,6 @@ function getAdjacentIndexes(boardBlocks, isHorizontal, shipBlocks) {
 
   return uniqueAdjacentIndexes;
 }
-// addShip(destroyer);
-// addShip(submarine);
-// addShip(cruiser);
-// addShip(battleship);
-// addShip("computer", carrier);
 
 // DRAG&DROP PLAYER SHIPS
 let draggedShip;
@@ -444,13 +465,6 @@ function startGameSingle() {
     }
   }
 }
-
-let playerHits = [];
-// let enemyHits = [];
-let computerHits = [];
-const playerSunkShips = [];
-const enemySunkShips = [];
-const computerSunkShips = [];
 
 function handleClick(e) {
   console.log(`current player: ${currentPlayer}`);
