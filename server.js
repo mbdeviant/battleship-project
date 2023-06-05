@@ -17,6 +17,8 @@ server.listen(PORT, () =>
 
 const connections = [null, null];
 const playerBoardData = {};
+let tmpTurn = 0;
+// let turn = 0;
 io.on("connection", (socket) => {
   let playerIndex = -1;
   for (const i in connections) {
@@ -69,22 +71,49 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("fire", (id) => {
+  socket.on("fire", (id, turn) => {
     console.log(`shot fired from ${playerIndex}`, id);
-    console.log(`${playerBoardData[0]}player 0`);
-    console.log(`${playerBoardData[1]}player 1`);
-    socket.broadcast.emit("fire", id);
+    // turn = (turnNum + 1) % 2;
+    // if (turnNum === playerIndex) {}
+    // socket.broadcast.emit("fire", id, turn); // what was it
+    if (turn === tmpTurn) {
+      socket.broadcast.emit("fire", id);
+    } else console.log("not your turn");
+    // emit turn change in fire, edit it on client,
+    // in event listener, on turn change
+    // io.emit("turn-change", turn);
+  });
+  socket.on("turn-change", (turnNum) => {
+    console.log(`current player turn ${turnNum}`);
+    // modify turn change here and send it to client and check there
+    // tmpTurn = turnNum;
+    tmpTurn = turnNum;
+    io.emit("turn-change", tmpTurn);
+    console.log(`${turnNum} turn changed brox`);
   });
 
-  socket.on("fire-reply", (block) => {
-    console.log(block);
+  // socket.on("turn-change", (turnNum) => {
+  //   console.log(`turn ${turn}`);
+  //   console.log(` turn num${turnNum}`);
+  //   io.emit("turn-change", turnNum);
+  // });
 
-    // forward it to other player
-    socket.broadcast.emit("fire-reply", block);
-  });
+  // socket.on("fire-reply", (block) => {
+  //   console.log(block);
+
+  //   // forward it to other player
+  //   socket.broadcast.emit("fire-reply", block);
+  // });
 });
+
+// console.log(`${playerBoardData[0]}player 0`);
+// console.log(`${playerBoardData[1]}player 1`);
 
 // const playerBoardData = Array.from(document.querySelectorAll("#player div"))
 //     .map((block) => block.classList.contains("filled") ? 1 : 0);
 //   socket.emit("board-data", playerBoardData);
 // }
+
+// switch turn on each on fire and pass it to client with id
+// on the client, if playerNum === playerturn then play
+// if not, return and say it's not their turn
