@@ -18,6 +18,7 @@ server.listen(PORT, () =>
 const connections = [null, null];
 const playerBoardData = {};
 let tmpTurn = 0;
+let tmpGameover = false;
 // let turn = 0;
 io.on("connection", (socket) => {
   let playerIndex = -1;
@@ -90,6 +91,12 @@ io.on("connection", (socket) => {
     tmpTurn = turnNum;
     io.emit("turn-change", tmpTurn);
     console.log(`${turnNum} turn changed brox`);
+  });
+
+  socket.on("gameover", (gameover) => {
+    tmpGameover = gameover;
+    io.emit("gameover", tmpGameover);
+    console.log(`${tmpGameover} gameover brox`);
   });
 
   // socket.on("turn-change", (turnNum) => {
