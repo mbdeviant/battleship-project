@@ -28,6 +28,7 @@ let user = "player";
 let currentPlayer = user;
 let gameMode = "";
 let playerNum = 0;
+let turnNum = 0;
 let ready = false;
 let gameOver = false;
 let enemyReady = false;
@@ -39,10 +40,12 @@ let multiPlayerStarted;
 
 function startMultiplayer() {
   gameMode = "multiplayer";
+  multiPlayerStarted = true;
 
   const socket = io();
 
   // get player number
+
   socket.on("player-number", (num) => {
     if (num === -1) {
       infoDisplay.innerHTML = "server is full";
@@ -88,24 +91,46 @@ function startMultiplayer() {
   // event listener for firing
 
   const boardBlocks = document.querySelectorAll("#computer div");
+  socket.on("turn-change", (turn) => {
+    turnNum = turn;
+  });
+  console.log(`${turnNum} ${playerNum} outside`);
   boardBlocks.forEach((block) => {
     block.addEventListener("click", (e) => {
-      if (currentPlayer === "player" && ready && enemyReady) {
+      // if (playerNum !== turnNum) return;
+      // if (turnNum === 1 || (turnNum === 0 && ready && enemyReady)) {
+      // }
+      // playerNum === turnNum &&
+      // if (turnNum === 1 || (turnNum === 0 && ready && enemyReady)) {
+      // }
+      if (turnNum === playerNum) {
         shotFired = handleClick(e);
-        console.log(shotFired);
+        console.log(shotFired, turnNum, playerNum);
+        turnNum = (turnNum + 1) % 2;
+        console.log(turnNum, playerNum);
+        socket.emit("turn-change", turnNum);
+        socket.emit("fire", shotFired, turnNum);
+      } else infoDisplay.innerHTML = "not your turn";
 
-        socket.emit("fire", shotFired);
-      }
+      // handleTurn();
     });
   });
+
+  // socket.on("fire", (id, turn) => {
+  //   turnNum = turn;
+  //   // shotFired = id;
+  //   console.log(`${turnNum} turn num`);
+  // });
+  // socket.on("turnChange", (turn) => {
+  //   console.log(`${turnNum} turn num`);
+  //   turnNum = turn;
+  // });
 
   socket.on("start-game", (player1BoardData, player2BoardData) => {
     const opponentBoardBlocks = document.querySelectorAll("#computer div");
 
-    const indexOffset = playerNum === 0 ? 0 : 10;
-
     for (let i = 0; i < opponentBoardBlocks.length; i += 1) {
-      const dataIndex = i + indexOffset;
+      const dataIndex = i;
       opponentBoardBlocks[i].className =
         playerNum === 0
           ? player2BoardData[dataIndex]
@@ -152,6 +177,11 @@ function startGameMulti(socket) {
     ).map((block) => block.className);
     socket.emit("board-data", playerBoardData);
   }
+}
+
+function handleTurn() {
+  if (turnNum === 0) currentPlayer = "player";
+  if (turnNum === 1) currentPlayer = "enemy";
 }
 
 function playerReady(num) {
@@ -416,14 +446,17 @@ function startGameSingle() {
 }
 
 let playerHits = [];
-let enemyHits = [];
+// let enemyHits = [];
 let computerHits = [];
 const playerSunkShips = [];
 const enemySunkShips = [];
 const computerSunkShips = [];
 
 function handleClick(e) {
-  console.log(currentPlayer);
+  console.log(`current player: ${currentPlayer}`);
+  console.log(`current turn: ${turnNum}`);
+  // current turn is not getting updated after player 0 takes it shot
+
   if (!gameOver) {
     if (e.target.classList.contains("hit")) return; // do this better
     if (e.target.classList.contains("filled")) {
@@ -433,28 +466,35 @@ function handleClick(e) {
         (name) => !["block", "hit", "filled", "unavailable"].includes(name)
       );
       // may need to use currentPlayer for events
-      if (currentPlayer === "player" || gameMode === "singleplayer") {
+      if (
+        currentPlayer === "player" ||
+        currentPlayer === "enemy" ||
+        gameMode === "singleplayer"
+      ) {
         playerHits.push(...classes);
         checkScore(currentPlayer, playerHits, playerSunkShips);
       }
 
-      if (currentPlayer === "enemy") {
-        enemyHits.push(...classes);
-        checkScore(currentPlayer, enemyHits, enemySunkShips);
-      }
+      // if (currentPlayer === "enemy") {
+      //   enemyHits.push(...classes);
+      //   checkScore(currentPlayer, enemyHits, enemySunkShips);
+      // }
     }
     if (!e.target.classList.contains("filled")) {
       infoDisplay.textContent = "Miss!";
       e.target.classList.add("miss");
     }
 
-    const boardBlocks = document.querySelectorAll("#computer div");
-    boardBlocks.forEach(
-      (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
-    );
+    // const boardBlocks = document.querySelectorAll("#computer div");
+    // boardBlocks.forEach(
+    //   (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
+    // );
+
+    // handleEventListeners();
     // if gamemode is single, do these?
-    if (gameMode === "singleplayer") {
+    if (gameMode === "singleplayer" && !gameOver) {
       playerTurn = false;
+
       setTimeout(computersTurn, 100);
     }
   }
@@ -491,13 +531,17 @@ function computersTurn() {
         playerBoard[randomShot].classList.add("miss");
       }
     }, 500);
-
+    const boardBlocks = document.querySelectorAll("#computer div");
+    boardBlocks.forEach(
+      (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
+    );
+    handleEventListeners();
     setTimeout(() => {
       playerTurn = true;
       turnDisplay.textContent = "Player's turn";
       infoDisplay.textContent = "Take your shot!";
 
-      handleEventListeners(); // re-adding event listeners
+      // re-adding event listeners
     }, 500);
   }
 }
@@ -511,14 +555,18 @@ function checkScore(user, userHits, userSunkShips) {
     if (
       userHits.filter((hitShip) => hitShip === shipName).length === shipLength
     ) {
-      if (user === "player" || gameMode === "singleplayer") {
+      if (
+        user === "player" ||
+        user === "enemy" ||
+        gameMode === "singleplayer"
+      ) {
         infoDisplay.textContent = `You sunk the enemy ${shipName}!`;
 
         playerHits = userHits.filter((hitShip) => hitShip !== shipName);
       }
-      if (user === "enemy") {
-        enemyHits = userHits.filter((hitShip) => hitShip !== shipName);
-      }
+      // if (user === "enemy") {
+      //   enemyHits = userHits.filter((hitShip) => hitShip !== shipName);
+      // }
       if (user === "computer") {
         infoDisplay.textContent = `The enemy sunk your ${shipName}!`;
         computerHits = userHits.filter((hitShip) => hitShip !== shipName);
