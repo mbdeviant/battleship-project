@@ -6,8 +6,6 @@ const startButton = document.getElementById("start-button");
 const infoDisplay = document.getElementById("info-display");
 const turnDisplay = document.getElementById("turn-display");
 
-let tmpBoardData = [];
-
 let playerHits = [];
 // let enemyHits = [];
 let computerHits = [];
@@ -48,10 +46,8 @@ let singlePlayerStarted;
 let multiPlayerStarted;
 
 function startMultiplayer() {
-  if (multiPlayerStarted) {
-    console.log("dont");
-    return;
-  }
+  if (multiPlayerStarted) return;
+  if (singlePlayerStarted) return;
   multiPlayerStarted = true;
   gameMode = "multiplayer";
 
@@ -65,14 +61,14 @@ function startMultiplayer() {
     } else {
       playerNum = parseInt(num);
       if (playerNum === 1) currentPlayer = "enemy";
-      console.log(playerNum);
+      // console.log(playerNum);
 
       socket.emit("check-players");
     }
   });
   // player connection control
   socket.on("player-connection", (num) => {
-    console.log(`player ${num} has connected`);
+    // console.log(`player ${num} has connected`);
     controlPlayerConnection(num);
   });
 
@@ -103,6 +99,7 @@ function startMultiplayer() {
 
   // event listener for firing
 
+  const playerBoardMulti = document.querySelectorAll("#player div");
   const boardBlocks = document.querySelectorAll("#computer div");
   socket.on("turn-change", (turn) => {
     turnNum = turn;
@@ -116,7 +113,7 @@ function startMultiplayer() {
       if (playerSunkShips.length !== 5) infoDisplay.innerHTML = "you lost";
     }
   });
-  console.log(`${turnNum} ${playerNum} outside`);
+
   boardBlocks.forEach((block) => {
     block.addEventListener("click", (e) => {
       if (turnNum === playerNum) {
@@ -125,34 +122,30 @@ function startMultiplayer() {
         // if hit return causes shotFired to be null and inclues doesn't work
         // but at least you can get the block class, or ish
         // no you can't, something wrong with block indexes
-        // if (tmpBoardData[shotFired].includes("filled")) {
-        //   console.log("that's a hit!");
-        // }
-        console.log(tmpBoardData[shotFired]);
+
         turnNum = (turnNum + 1) % 2;
 
-        console.log(turnNum, playerNum);
         socket.emit("turn-change", turnNum);
         socket.emit("fire", shotFired, turnNum);
         socket.emit("gameover", gameOver);
       } else turnDisplay.innerHTML = "not your turn";
-
-      // handleTurn();
     });
   });
 
-  // socket.on("fire", (id, turn) => {
-  //   turnNum = turn;
-  //   // shotFired = id;
-  //   console.log(`${turnNum} turn num`);
-  // });
-  // socket.on("turnChange", (turn) => {
-  //   console.log(`${turnNum} turn num`);
-  //   turnNum = turn;
-  // });
+  let playerBoardData;
+  socket.on("fire", (id) => {
+    const block = document.querySelector(`#player div[id='${id}']`);
+    const isHit = Array.from(playerBoardData).some((node) => node.id === id);
+
+    if (isHit) block.classList.add("hit");
+    else block.classList.add("miss");
+    console.log(`the enemy shot your ${id} block!`);
+  });
 
   socket.on("start-game", (player1BoardData, player2BoardData) => {
     const opponentBoardBlocks = document.querySelectorAll("#computer div");
+    playerBoardData = document.querySelectorAll("#player div.filled");
+    console.log(playerBoardData);
 
     for (let i = 0; i < opponentBoardBlocks.length; i += 1) {
       const dataIndex = i;
@@ -199,7 +192,6 @@ function startGameMulti(socket) {
       document.querySelectorAll("#player div")
     ).map((block) => block.className);
     socket.emit("board-data", playerBoardData);
-    tmpBoardData = playerBoardData;
   }
 }
 function handleGameover() {
@@ -218,7 +210,8 @@ function playerReady(num) {
 // start single player game
 function startSinglePlayer() {
   if (gameOver) return;
-  if (singlePlayerStarted === true) return;
+  if (singlePlayerStarted) return;
+  if (multiPlayerStarted) return;
   singlePlayerStarted = true;
   gameMode = "singleplayer";
   user = "computer";
@@ -307,7 +300,6 @@ function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
 }
 
 function addShip(user, ship, startId) {
-  console.log("addship");
   //   console.log(user);
   const boardBlocks = document.querySelectorAll(`#${user} div`);
   const bool = Math.random() < 0.5; // returned number either will be bigger than 0.5 or not hence the random bool
@@ -399,7 +391,6 @@ playerBoard.forEach((block) => {
 function dragStart(e) {
   notDropped = false;
   draggedShip = e.target;
-  console.log("drag started");
 }
 
 function dragOver(e) {
@@ -414,7 +405,6 @@ function dragOver(e) {
 }
 
 function dropShip(e) {
-  console.log("dropship");
   const startId = e.target.id;
   if (draggedShip === undefined || draggedShip === null) return;
   const ship = ships[draggedShip.id];
@@ -467,8 +457,6 @@ function startGameSingle() {
 }
 
 function handleClick(e) {
-  console.log(`current player: ${currentPlayer}`);
-  console.log(`current turn: ${turnNum}`);
   // current turn is not getting updated after player 0 takes it shot
 
   if (!gameOver) {
@@ -509,7 +497,7 @@ function handleClick(e) {
     if (gameMode === "singleplayer" && !gameOver) {
       playerTurn = false;
 
-      setTimeout(computersTurn, 100);
+      setTimeout(computersTurn, 250);
     }
   }
   return e.target.id; // use this to communicate with server?
@@ -544,7 +532,7 @@ function computersTurn() {
         infoDisplay.textContent = "Miss!";
         playerBoard[randomShot].classList.add("miss");
       }
-    }, 500);
+    }, 250);
     const boardBlocks = document.querySelectorAll("#computer div");
     boardBlocks.forEach(
       (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
@@ -556,7 +544,7 @@ function computersTurn() {
       infoDisplay.textContent = "Take your shot!";
 
       // re-adding event listeners
-    }, 500);
+    }, 250);
   }
 }
 function handleEventListeners() {
@@ -593,7 +581,7 @@ function checkScore(user, userHits, userSunkShips) {
   checkShip("cruiser", 3);
   checkShip("battleship", 4);
   checkShip("carrier", 5);
-  console.log("playerHits", playerHits);
+
   console.log("playerSunkShips", playerSunkShips);
 
   if (playerSunkShips.length === 5) {
