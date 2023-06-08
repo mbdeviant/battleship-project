@@ -7,6 +7,10 @@
     <script src="main.js" defer></script>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
     <title>Battleship</title>
   </head>
   <body>
@@ -24,11 +28,12 @@
       <div class="ready">Ready<span></span></div>
     </div>
 
+    <div id="gameboard-container"></div>
+
     <div id="game-info">
       <p>Turn: <span id="turn-display"></span></p>
       <p>Info: <span id="info-display"></span></p>
     </div>
-    <div id="gameboard-container"></div>
 
     <div class="ship-select-container">
       <div
