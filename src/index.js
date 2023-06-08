@@ -99,7 +99,6 @@ function startMultiplayer() {
 
   // event listener for firing
 
-  const playerBoardMulti = document.querySelectorAll("#player div");
   const boardBlocks = document.querySelectorAll("#computer div");
   socket.on("turn-change", (turn) => {
     turnNum = turn;
@@ -118,10 +117,16 @@ function startMultiplayer() {
     block.addEventListener("click", (e) => {
       if (turnNum === playerNum) {
         if (gameOver) return;
+        if (!allShipsPlaced) {
+          infoDisplay.innerHTML = "lütfen önce gemilerinizi yerleştirin!";
+          return;
+        }
+        if (!enemyReady) {
+          infoDisplay.innerHTML = "lütfen rakibinizi bekleyin";
+          return;
+        }
         shotFired = handleClick(e);
-        // if hit return causes shotFired to be null and inclues doesn't work
-        // but at least you can get the block class, or ish
-        // no you can't, something wrong with block indexes
+        console.log(enemyReady);
 
         turnNum = (turnNum + 1) % 2;
 
@@ -136,9 +141,10 @@ function startMultiplayer() {
   socket.on("fire", (id) => {
     const block = document.querySelector(`#player div[id='${id}']`);
     const isHit = Array.from(playerBoardData).some((node) => node.id === id);
-
+    // do something else if it's already hit.
     if (isHit) block.classList.add("hit");
     else block.classList.add("miss");
+
     console.log(`the enemy shot your ${id} block!`);
   });
 
@@ -401,7 +407,7 @@ function dragOver(e) {
   if (!draggedShip) return;
   const ship = ships[draggedShip.id];
 
-  highlightShipArea(e.target.id, ship);
+  // highlightShipArea(e.target.id, ship);
 }
 
 function dropShip(e) {
@@ -416,23 +422,23 @@ function dropShip(e) {
   draggedShip = null;
 }
 
-function highlightShipArea(startIndex, ship) {
-  const isHorizontal = angle === 0;
+// function highlightShipArea(startIndex, ship) {
+//   const isHorizontal = angle === 0;
 
-  const { shipBlocks, isValid, notTaken } = checkValidity(
-    playerBoard,
-    isHorizontal,
-    startIndex,
-    ship
-  );
+//   const { shipBlocks, isValid, notTaken } = checkValidity(
+//     playerBoard,
+//     isHorizontal,
+//     startIndex,
+//     ship
+//   );
 
-  if (isValid && notTaken) {
-    shipBlocks.forEach((block) => {
-      block.classList.add("hover");
-      setTimeout(() => block.classList.remove("hover"), 500);
-    });
-  }
-}
+//   if (isValid && notTaken) {
+//     shipBlocks.forEach((block) => {
+//       block.classList.add("hover");
+//       setTimeout(() => block.classList.remove("hover"), 500);
+//     });
+//   }
+// }
 
 // GAME LOGIC
 
@@ -459,7 +465,7 @@ function startGameSingle() {
 function handleClick(e) {
   // current turn is not getting updated after player 0 takes it shot
 
-  if (!gameOver) {
+  if (!gameOver && allShipsPlaced) {
     if (e.target.classList.contains("hit")) return; // do this better
     if (e.target.classList.contains("filled")) {
       e.target.classList.add("hit");
