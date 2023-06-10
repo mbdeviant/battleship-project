@@ -8,13 +8,40 @@ body {
   flex-direction: column;
   align-items: center;
 }
+button {
+  background-color: rgb(255, 242, 242);
+  padding: 4px;
+  border: 1px solid rgb(255, 242, 242);
+  width: auto;
+  border-radius: 12px;
+}
 button:hover {
   cursor: pointer;
 }
+.connected,
+.ready {
+  font-weight: normal;
+}
+.connected span,
+.ready span {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  background: red;
+}
+span.green {
+  background: green;
+}
+
 #gameboard-container {
   width: 850px;
   display: flex;
   justify-content: space-between;
+}
+#game-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 .gameboard {
   width: 250px;
@@ -22,6 +49,11 @@ button:hover {
   display: flex;
   flex-wrap: wrap;
   border: 1px solid rgba(0, 0, 0, 0.3);
+}
+.game-control-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
 }
 .block {
   width: 25px;
@@ -32,11 +64,7 @@ button:hover {
   box-shadow: 0 0 1px black;
   box-sizing: border-box;
 }
-#game-info {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+
 .ship-select-container {
   width: 750px;
   height: 150px;
@@ -46,21 +74,14 @@ button:hover {
   justify-content: center;
   background-color: transparent;
 }
-.destroyer {
-  background-color: rgb(255, 242, 242);
-}
-.submarine {
-  background-color: rgb(255, 242, 242);
-}
-.cruiser {
-  background-color: rgb(255, 242, 242);
-}
-.battleship {
-  background-color: rgb(255, 242, 242);
-}
+.destroyer,
+.submarine,
+.cruiser,
+.battleship,
 .carrier {
   background-color: rgb(255, 242, 242);
 }
+
 #computer .destroyer,
 #computer .submarine,
 #computer .cruiser,
@@ -98,12 +119,7 @@ button:hover {
 .hover {
   background-color: gray;
 }
-/* .hit {
-  background-color: red !important;
-}
-.miss {
-  background-color: gray !important;
-} */
+
 .miss,
 .hit {
   display: flex;
@@ -124,19 +140,4 @@ button:hover {
 }
 .hit::after {
   background-color: rgb(206, 29, 29);
-}
-
-.connected,
-.ready {
-  font-weight: normal;
-}
-.connected span,
-.ready span {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  background: red;
-}
-span.green {
-  background: green;
 }
