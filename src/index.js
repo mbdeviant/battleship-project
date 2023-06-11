@@ -404,7 +404,7 @@ function dragOver(e) {
   if (!draggedShip) return;
   const ship = ships[draggedShip.id];
 
-  // highlightShipArea(e.target.id, ship);
+  highlightShipArea(e.target.id, ship);
 }
 
 function dropShip(e) {
@@ -419,23 +419,23 @@ function dropShip(e) {
   draggedShip = null;
 }
 
-// function highlightShipArea(startIndex, ship) {
-//   const isHorizontal = angle === 0;
+function highlightShipArea(startIndex, ship) {
+  const isHorizontal = angle === 0;
 
-//   const { shipBlocks, isValid, notTaken } = checkValidity(
-//     playerBoard,
-//     isHorizontal,
-//     startIndex,
-//     ship
-//   );
+  const { shipBlocks, isValid, notTaken } = checkValidity(
+    playerBoard,
+    isHorizontal,
+    startIndex,
+    ship
+  );
 
-//   if (isValid && notTaken) {
-//     shipBlocks.forEach((block) => {
-//       block.classList.add("hover");
-//       setTimeout(() => block.classList.remove("hover"), 500);
-//     });
-//   }
-// }
+  if (isValid && notTaken) {
+    shipBlocks.forEach((block) => {
+      block.classList.add("hover");
+      setTimeout(() => block.classList.remove("hover"), 500);
+    });
+  }
+}
 
 // GAME LOGIC
 
