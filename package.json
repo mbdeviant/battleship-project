@@ -1,27 +1,35 @@
 {
-    "name": "battleship-project",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/mbdeviant/battleship-project.git"
-    },
-    "keywords": [],
-    "author": "deviant",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/mbdeviant/battleship-project/issues"
-    },
-    "homepage": "https://github.com/mbdeviant/battleship-project#readme",
-    "devDependencies": {
-        "eslint": "^8.36.0",
-        "eslint-config-airbnb-base": "^15.0.0",
-        "eslint-config-prettier": "^8.8.0",
-        "webpack": "^5.76.3",
-        "webpack-cli": "^5.0.1"
-    }
+  "name": "battleship-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js ",
+    "build": "webpack --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mbdeviant/battleship-project.git"
+  },
+  "keywords": [],
+  "author": "deviant",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mbdeviant/battleship-project/issues"
+  },
+  "homepage": "https://github.com/mbdeviant/battleship-project#readme",
+  "devDependencies": {
+    "eslint": "^8.36.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.8.0",
+    "nodemon": "^2.0.22",
+    "socket.io-client": "^4.6.1",
+    "webpack": "^5.76.3",
+    "webpack-cli": "^5.0.1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "webpack-node-externals": "^3.0.0"
+  }
 }
