@@ -7,9 +7,24 @@ const connectionInfo = document.getElementById("connection-info");
 const gameControlButtons = document.getElementById("game-control-buttons");
 const turnDisplay = document.getElementById("turn-display");
 const gameInfo = document.getElementById("game-info");
+const flipButton = document.getElementById("flip-button");
+const shipContainer = document.querySelector(".ship-select-container");
 const reloadButton = document.createElement("button");
 reloadButton.innerHTML = "Tekrar oyna";
 
+let user = "player";
+let currentPlayer = user;
+let gameMode = "";
+let playerNum = 0;
+let turnNum = 0;
+let ready = false;
+let gameOver = false;
+let enemyReady = false;
+let allShipsPlaced = false;
+let shotFired = -1;
+let notDropped;
+let singlePlayerStarted;
+let multiPlayerStarted;
 let playerHits = [];
 let computerHits = [];
 
@@ -31,22 +46,6 @@ const battleship = new Ship("battleship", 4);
 const carrier = new Ship("carrier", 5);
 
 const ships = [destroyer, submarine, cruiser, battleship, carrier];
-
-const flipButton = document.getElementById("flip-button");
-const shipContainer = document.querySelector(".ship-select-container");
-let user = "player";
-let currentPlayer = user;
-let gameMode = "";
-let playerNum = 0;
-let turnNum = 0;
-let ready = false;
-let gameOver = false;
-let enemyReady = false;
-let allShipsPlaced = false;
-let shotFired = -1;
-let notDropped;
-let singlePlayerStarted;
-let multiPlayerStarted;
 
 function startMultiplayer() {
   if (multiPlayerStarted) return;
