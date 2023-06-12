@@ -11,6 +11,7 @@
   },
   "rules": {
     "consistent-return": "off",
+    "no-restricted-globals": "off",
     "no-unused-expressions": "off",
     "guard-for-in": "off",
     "no-shadow": "off",
