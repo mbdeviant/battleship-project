@@ -1,16 +1,19 @@
-// multi-single player controls
 const singlePlayerButton = document.getElementById("single-player-button");
 const multiplayerButton = document.getElementById("multiplayer-button");
-// start the game
 const startButton = document.getElementById("start-button");
 const infoDisplay = document.getElementById("info-display");
+const shipSelectContainer = document.getElementById("ships");
+const connectionInfo = document.getElementById("connection-info");
+const gameControlButtons = document.getElementById("game-control-buttons");
 const turnDisplay = document.getElementById("turn-display");
+const gameInfo = document.getElementById("game-info");
+const reloadButton = document.createElement("button");
+reloadButton.innerHTML = "Tekrar oyna";
 
 let playerHits = [];
-// let enemyHits = [];
 let computerHits = [];
+
 const playerSunkShips = [];
-const enemySunkShips = [];
 const computerSunkShips = [];
 
 // CREATING SHIPS
@@ -51,17 +54,21 @@ function startMultiplayer() {
   multiPlayerStarted = true;
   gameMode = "multiplayer";
 
+  connectionInfo.classList.remove("hidden");
+  infoDisplay.innerHTML =
+    "Çok oyunculu mod başladı! Lütfen gemilerini yerleştir.";
+
   const socket = io();
 
   // get player number
-
   socket.on("player-number", (num) => {
     if (num === -1) {
       infoDisplay.innerHTML = "Sunucu dolu. Lütfen daha sonra tekrar dene.";
+      socket.disconnect();
+      setTimeout(() => location.reload(), 2500);
     } else {
       playerNum = parseInt(num);
       if (playerNum === 1) currentPlayer = "enemy";
-      // console.log(playerNum);
 
       socket.emit("check-players");
     }
@@ -94,11 +101,9 @@ function startMultiplayer() {
     if (!allShipsPlaced) return;
     if (allShipsPlaced) startGameMulti(socket);
     else infoDisplay.innerHTML = "Lütfen önce gemilerini yerleştir!";
-    // const boardBlocks = document.querySelectorAll("#computer div");
   });
 
   // event listener for firing
-
   const boardBlocks = document.querySelectorAll("#computer div");
   socket.on("turn-change", (turn) => {
     turnNum = turn;
@@ -109,6 +114,8 @@ function startMultiplayer() {
     gameOver = status;
     if (gameOver) {
       turnDisplay.textContent = "Oyun bitti!";
+      gameInfo.append(reloadButton);
+      reloadButton.onclick = () => location.reload();
       if (playerSunkShips.length !== 5)
         infoDisplay.innerHTML = "Rakibin bütün gemilerini yok etti. Kaybettin!";
     }
@@ -142,7 +149,6 @@ function startMultiplayer() {
   socket.on("fire", (id) => {
     const block = document.querySelector(`#player div[id='${id}']`);
     const isHit = Array.from(playerBoardData).some((node) => node.id === id);
-    // do something else if it's already hit.
     if (isHit) block.classList.add("hit");
     else block.classList.add("miss");
 
@@ -163,10 +169,8 @@ function startMultiplayer() {
     }
   });
 
-  // receiving fire
-
   function controlPlayerConnection(num) {
-    const player = `.p${parseInt(num) + 1}`;
+    const player = `.p${parseInt(num) + 1}`; // +1 because indexes starts from zero
     document
       .querySelector(`${player} .connected span`)
       .classList.toggle("green");
@@ -200,6 +204,8 @@ function startGameMulti(socket) {
     ).map((block) => block.className);
     socket.emit("board-data", playerBoardData);
   }
+
+  gameControlButtons.classList.add("hidden");
 }
 
 function playerReady(num) {
@@ -207,7 +213,7 @@ function playerReady(num) {
   document.querySelector(`${player} .ready span`).classList.toggle("green");
 }
 
-// start single player game
+// start single player game mode
 function startSinglePlayer() {
   if (gameOver) return;
   if (singlePlayerStarted) return;
@@ -216,6 +222,8 @@ function startSinglePlayer() {
   gameMode = "singleplayer";
   user = "computer";
   ships.forEach((ship) => addShip("computer", ship));
+  infoDisplay.innerHTML =
+    "Tek oyunculu oyun başladı! Lütfen gemilerini yerleştir.";
   startButton.addEventListener("click", startGameSingle);
 }
 singlePlayerButton.addEventListener("click", startSinglePlayer);
@@ -231,7 +239,7 @@ function flipShips() {
 }
 flipButton.addEventListener("click", flipShips);
 
-// CREATING GAMEBOARD
+// creating gameboards
 function createBoard(color, user) {
   const gameBoardContainer = document.getElementById("gameboard-container");
 
@@ -253,8 +261,6 @@ function createBoard(color, user) {
 createBoard("white", user);
 createBoard("gainsboro", "computer");
 
-// console.log(ships);
-
 function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
   // to prevent placing ships off board
   // eslint-disable-next-line no-nested-ternary
@@ -265,7 +271,6 @@ function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
     : startIndex <= 10 * 10 - 10 * ship.length
     ? startIndex
     : startIndex - ship.length * 10 + 10;
-  //   console.log(`validated i ${validStart}`);
 
   const shipBlocks = [];
   // save the indexes of ships to an array
@@ -289,7 +294,6 @@ function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
       (_block, index) => (isValid = shipBlocks[0].id < 90 + (10 * index + 1))
     );
   }
-  // console.log(`is valid? ${isValid}`);
   const notTaken = shipBlocks.every(
     (block) =>
       !block.classList.contains("filled") &&
@@ -300,16 +304,12 @@ function checkValidity(boardBlocks, isHorizontal, startIndex, ship) {
 }
 
 function addShip(user, ship, startId) {
-  //   console.log(user);
   const boardBlocks = document.querySelectorAll(`#${user} div`);
   const bool = Math.random() < 0.5; // returned number either will be bigger than 0.5 or not hence the random bool
   const isHorizontal = user === "player" ? angle === 0 : bool;
   const randomStartIndex = Math.floor(Math.random() * 10 * 10); // ten times ten is the width of the board
-  //   console.log(`horizontal ${isHorizontal}`);
-  //   console.log(`random index ${randomStartIndex}`);
 
   const startIndex = startId || randomStartIndex;
-  //   console.log(`start index ${startIndex}`);
 
   const { shipBlocks, isValid, notTaken } = checkValidity(
     boardBlocks,
@@ -327,7 +327,7 @@ function addShip(user, ship, startId) {
       block.classList.add(ship.name);
       block.classList.add("filled");
     });
-    // add filled class to adjacent blocks to prevent placing ships side to side
+    // add unavailable class to adjacent blocks to prevent placing ships side to side
     const adjacentIndexes = getAdjacentIndexes(
       boardBlocks,
       isHorizontal,
@@ -337,7 +337,6 @@ function addShip(user, ship, startId) {
       const adjacentBlock = boardBlocks[adjacentIndex];
       adjacentBlock.classList.add("unavailable");
     });
-    // console.log(adjacentIndexes);
   } else {
     if (user === "computer") addShip(user, ship, startId);
     if (user === "player") notDropped = true;
@@ -374,13 +373,11 @@ function getAdjacentIndexes(boardBlocks, isHorizontal, shipBlocks) {
       if (row < 9 && col < 9) adjacentIndexes.push(blockIndex + 11); // bottom-right block
     }
   });
-
   const uniqueAdjacentIndexes = Array.from(new Set(adjacentIndexes));
-
   return uniqueAdjacentIndexes;
 }
 
-// DRAG&DROP PLAYER SHIPS
+// drag&drop ships
 let draggedShip;
 const shipOptions = Array.from(shipContainer.children);
 shipOptions.forEach((ship) => ship.addEventListener("dragstart", dragStart));
@@ -397,10 +394,7 @@ function dragStart(e) {
 }
 
 function dragOver(e) {
-  // console.log("dragover");
-  // console.log(e.target.parentNode);
   e.preventDefault();
-
   if (!draggedShip) return;
   const ship = ships[draggedShip.id];
 
@@ -408,14 +402,20 @@ function dragOver(e) {
 }
 
 function dropShip(e) {
+  if (!multiPlayerStarted && !singlePlayerStarted) {
+    infoDisplay.innerHTML = "Lütfen oyun modu seçiniz!";
+    return;
+  }
   const startId = e.target.id;
   if (draggedShip === undefined || draggedShip === null) return;
   const ship = ships[draggedShip.id];
-  // console.log(ship, "this is ship");
 
   addShip("player", ship, startId);
   if (!notDropped) draggedShip.remove();
-  if (!shipContainer.querySelector(".ship")) allShipsPlaced = true;
+  if (!shipContainer.querySelector(".ship")) {
+    allShipsPlaced = true;
+    shipSelectContainer.style.display = "none";
+  }
   draggedShip = null;
 }
 
@@ -437,12 +437,8 @@ function highlightShipArea(startIndex, ship) {
   }
 }
 
-// GAME LOGIC
-
 let playerTurn;
-
-// start the game
-
+// starting singe player game
 function startGameSingle() {
   if (playerTurn === undefined) {
     if (shipContainer.children.length !== 0) {
@@ -455,22 +451,22 @@ function startGameSingle() {
       playerTurn = true;
       turnDisplay.textContent = "Senin sıran";
       infoDisplay.textContent = "Oyun başladı!";
+      gameControlButtons.classList.add("hidden");
     }
   }
 }
 
 function handleClick(e) {
-  // current turn is not getting updated after player 0 takes it shot
   if (gameMode === "singleplayer" && !playerTurn) return;
   if (!gameOver && allShipsPlaced) {
-    if (e.target.classList.contains("hit")) return; // do this better
+    if (e.target.classList.contains("hit")) return;
     if (e.target.classList.contains("filled")) {
       e.target.classList.add("hit");
       infoDisplay.textContent = "Bir gemiyi vurdun!";
       const classes = Array.from(e.target.classList).filter(
         (name) => !["block", "hit", "filled", "unavailable"].includes(name)
       );
-      // may need to use currentPlayer for events
+
       if (
         currentPlayer === "player" ||
         currentPlayer === "enemy" ||
@@ -485,20 +481,13 @@ function handleClick(e) {
       e.target.classList.add("miss");
     }
 
-    // const boardBlocks = document.querySelectorAll("#computer div");
-    // boardBlocks.forEach(
-    //   (block) => block.replaceWith(block.cloneNode(true)) // to remove event listeners
-    // );
-
-    // handleEventListeners();
-    // if gamemode is single, do these?
     if (gameMode === "singleplayer" && !gameOver) {
       playerTurn = false;
 
       setTimeout(computersTurn, 750);
     }
   }
-  return e.target.id; // use this to communicate with server?
+  return e.target.id;
 }
 
 // computers turn
@@ -562,9 +551,6 @@ function checkScore(user, userHits, userSunkShips) {
 
         playerHits = userHits.filter((hitShip) => hitShip !== shipName);
       }
-      // if (user === "enemy") {
-      //   enemyHits = userHits.filter((hitShip) => hitShip !== shipName);
-      // }
       if (user === "computer") {
         infoDisplay.textContent = `Rakip ${shipName} gemini batırdı!`;
         computerHits = userHits.filter((hitShip) => hitShip !== shipName);
@@ -577,14 +563,16 @@ function checkScore(user, userHits, userSunkShips) {
   checkShip("cruiser", 3);
   checkShip("battleship", 4);
   checkShip("carrier", 5);
-
   console.log("playerSunkShips", playerSunkShips);
 
   if (playerSunkShips.length === 5) {
     infoDisplay.textContent = "Rakibin bütün gemilerini yok ettin. Kazandın!"; // game over player 1 won
     gameOver = true;
-    if (gameMode === "singleplayer")
+    if (gameMode === "singleplayer") {
       startButton.removeEventListener("click", startGameSingle);
+      gameInfo.append(reloadButton);
+      reloadButton.onclick = () => location.reload();
+    }
   }
   if (computerSunkShips.length === 5) {
     infoDisplay.textContent = "Bütün gemilerin yok edildi. İyi savaştı amiral.";
