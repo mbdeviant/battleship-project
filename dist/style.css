@@ -1,12 +1,23 @@
 * {
   background-color: #bebebe;
   margin: 0;
+  height: 100%;
 }
+
 body {
   font-family: "Poppins", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-image: url("../img/background.jpg");
+  background-attachment: fixed;
+  background-size: cover;
+}
+#main-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: transparent;
 }
 button {
   background-color: rgb(255, 242, 242);
@@ -32,23 +43,41 @@ button:hover {
 span.green {
   background: green;
 }
-
+p,
+span {
+  background: transparent;
+}
 #gameboard-container {
   width: 850px;
+  height: fit-content;
   display: flex;
   justify-content: space-between;
+  background-color: transparent;
 }
 #game-info {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 30px;
+  align-items: center;
+  gap: 7px;
+  height: 60px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+  color: white;
+  background-color: transparent;
+  user-select: none;
 }
-.connection-info {
+#connection-info {
   width: 850px;
+  height: 100px;
   display: flex;
+  display: hidden;
   justify-content: space-between;
   margin-bottom: 14px;
+  background-color: transparent;
+}
+.hidden {
+  visibility: hidden;
 }
 .player {
   width: 100px;
@@ -56,6 +85,7 @@ span.green {
   flex-direction: column;
   gap: 3px;
   align-items: flex-start;
+  background-color: transparent;
 }
 .connected,
 .ready {
@@ -64,6 +94,7 @@ span.green {
   align-items: center;
   justify-content: space-between;
   gap: 4px;
+  background-color: transparent;
 }
 .gameboard {
   width: 250px;
@@ -72,13 +103,17 @@ span.green {
   flex-wrap: wrap;
   border: 1px solid rgba(0, 0, 0, 0.3);
 }
-.game-mode-buttons {
+#game-mode-buttons {
   margin-top: 14px;
+  height: 25px;
+  background-color: transparent;
 }
-.game-control-buttons {
+#game-control-buttons {
   display: flex;
   flex-direction: column;
   gap: 17px;
+  height: 25px;
+  background-color: transparent;
 }
 .block {
   width: 25px;
