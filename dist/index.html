@@ -14,58 +14,60 @@
     <title>Battleship</title>
   </head>
   <body>
-    <div class="game-mode-buttons">
-      <button id="single-player-button">Tek oyunculu</button>
-      <button id="multiplayer-button">İki oyunculu</button>
-    </div>
-
-    <div class="connection-info">
-      <div class="player p1">
-        Oyuncu 1
-
-        <div class="connected">Bağlantı<span></span></div>
-        <div class="ready">Hazır<span></span></div>
+    <div id="main-container">
+      <div id="game-mode-buttons">
+        <button id="single-player-button">Tek oyunculu</button>
+        <button id="multiplayer-button">İki oyunculu</button>
       </div>
-      <div class="player p2">
-        Oyuncu 2
-        <div class="connected">Bağlantı<span></span></div>
-        <div class="ready">Hazır<span></span></div>
+
+      <div id="connection-info" class="hidden">
+        <div class="player p1">
+          Oyuncu 1
+
+          <div class="connected">Bağlantı<span></span></div>
+          <div class="ready">Hazır<span></span></div>
+        </div>
+        <div class="player p2">
+          Oyuncu 2
+          <div class="connected">Bağlantı<span></span></div>
+          <div class="ready">Hazır<span></span></div>
+        </div>
       </div>
-    </div>
 
-    <div id="gameboard-container"></div>
+      <div id="gameboard-container"></div>
 
-    <div id="game-info">
-      <p>Sıra: <span id="turn-display"></span></p>
-      <p>Bilgi: <span id="info-display"></span></p>
-    </div>
+      <div id="game-info">
+        <p><span id="turn-display"></span></p>
+        <p><span id="info-display"></span></p>
+      </div>
 
-    <div class="ship-select-container">
-      <div
-        id="0"
-        class="ship destroyer destroyer-preview"
-        draggable="true"
-      ></div>
+      <div id="ships" class="ship-select-container">
+        <div
+          id="0"
+          class="ship destroyer destroyer-preview"
+          draggable="true"
+        ></div>
 
-      <div
-        id="1"
-        class="ship submarine submarine-preview"
-        draggable="true"
-      ></div>
+        <div
+          id="1"
+          class="ship submarine submarine-preview"
+          draggable="true"
+        ></div>
 
-      <div id="2" class="ship cruiser cruiser-preview" draggable="true"></div>
+        <div id="2" class="ship cruiser cruiser-preview" draggable="true"></div>
 
-      <div
-        id="3"
-        class="ship battleship battleship-preview"
-        draggable="true"
-      ></div>
+        <div
+          id="3"
+          class="ship battleship battleship-preview"
+          draggable="true"
+        ></div>
 
-      <div id="4" class="ship carrier carrier-preview" draggable="true"></div>
-    </div>
-    <div class="game-control-buttons">
-      <button id="flip-button">ÇEVİR</button>
-      <button id="start-button">BAŞLA</button>
+        <div id="4" class="ship carrier carrier-preview" draggable="true"></div>
+      </div>
+      <div id="game-control-buttons">
+        <button id="flip-button">ÇEVİR</button>
+        <button id="start-button">BAŞLA</button>
+      </div>
     </div>
   </body>
 </html>
