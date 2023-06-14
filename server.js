@@ -1,13 +1,23 @@
+process.env.NODE_ENV = "production";
+
 const express = require("express");
 const path = require("path");
 const http = require("http");
 const PORT = process.env.PORT || 3000;
+const helmet = require("helmet");
 const socketio = require("socket.io");
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
 // Serve static files from the 'dist' directory
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"],
+    },
+  })
+);
 
 app.use(express.static(path.join(__dirname, "dist")));
 
@@ -19,7 +29,7 @@ const connections = [null, null];
 const playerBoardData = {};
 let tmpTurn = 0;
 let tmpGameover = false;
-// let turn = 0;
+
 io.on("connection", (socket) => {
   let playerIndex = -1;
   for (const i in connections) {
@@ -73,23 +83,17 @@ io.on("connection", (socket) => {
   });
 
   socket.on("fire", (id, turn) => {
-    console.log(`shot fired from ${playerIndex}`, id);
-
     if (turn === tmpTurn) {
       socket.broadcast.emit("fire", id);
-    } else console.log("not your turn");
+    }
   });
   socket.on("turn-change", (turnNum) => {
-    console.log(`current player turn ${turnNum}`);
-
     tmpTurn = turnNum;
     io.emit("turn-change", tmpTurn);
-    console.log(`${turnNum} turn changed brox`);
   });
 
   socket.on("gameover", (gameover) => {
     tmpGameover = gameover;
     io.emit("gameover", tmpGameover);
-    console.log(`${tmpGameover} gameover brox`);
   });
 });
