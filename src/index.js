@@ -1,3 +1,6 @@
+import DisableDevtool from "disable-devtool";
+DisableDevtool();
+
 const singlePlayerButton = document.getElementById("single-player-button");
 const multiplayerButton = document.getElementById("multiplayer-button");
 const startButton = document.getElementById("start-button");
@@ -74,7 +77,6 @@ function startMultiplayer() {
   });
   // player connection control
   socket.on("player-connection", (num) => {
-    // console.log(`player ${num} has connected`);
     controlPlayerConnection(num);
   });
 
@@ -133,8 +135,6 @@ function startMultiplayer() {
           return;
         }
         shotFired = handleClick(e);
-        console.log(enemyReady);
-
         turnNum = (turnNum + 1) % 2;
 
         socket.emit("turn-change", turnNum);
@@ -150,14 +150,11 @@ function startMultiplayer() {
     const isHit = Array.from(playerBoardData).some((node) => node.id === id);
     if (isHit) block.classList.add("hit");
     else block.classList.add("miss");
-
-    console.log(`the enemy shot your ${id} block!`);
   });
 
   socket.on("start-game", (player1BoardData, player2BoardData) => {
     const opponentBoardBlocks = document.querySelectorAll("#computer div");
     playerBoardData = document.querySelectorAll("#player div.filled");
-    console.log(playerBoardData);
 
     for (let i = 0; i < opponentBoardBlocks.length; i += 1) {
       const dataIndex = i;
@@ -183,7 +180,6 @@ multiplayerButton.addEventListener("click", startMultiplayer);
 // start multiplayer game
 function startGameMulti(socket) {
   if (gameOver) return;
-  console.log(currentPlayer);
   if (!ready) {
     socket.emit("player-ready");
     ready = true;
@@ -562,8 +558,6 @@ function checkScore(user, userHits, userSunkShips) {
   checkShip("cruiser", 3);
   checkShip("battleship", 4);
   checkShip("carrier", 5);
-  console.log("playerSunkShips", playerSunkShips);
-
   if (playerSunkShips.length === 5) {
     infoDisplay.textContent = "Rakibin bütün gemilerini yok ettin. Kazandın!"; // game over player 1 won
     gameOver = true;
