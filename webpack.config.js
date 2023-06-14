@@ -2,7 +2,7 @@ const path = require("path");
 // eslint-disable-next-line import/no-extraneous-dependencies
 
 module.exports = {
-  mode: "development",
+  mode: "production",
   entry: "./src/index.js",
   output: {
     filename: "main.js",
