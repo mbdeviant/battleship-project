@@ -13,7 +13,7 @@ const gameInfo = document.getElementById("game-info");
 const flipButton = document.getElementById("flip-button");
 const shipContainer = document.querySelector(".ship-select-container");
 const reloadButton = document.createElement("button");
-reloadButton.innerHTML = "Tekrar oyna";
+reloadButton.innerHTML = "Play again";
 
 let user = "player";
 let currentPlayer = user;
@@ -57,15 +57,14 @@ function startMultiplayer() {
   gameMode = "multiplayer";
 
   connectionInfo.classList.remove("hidden");
-  infoDisplay.innerHTML =
-    "Çok oyunculu mod başladı! Lütfen gemilerini yerleştir.";
+  infoDisplay.innerHTML = "Multiplayer mode started, place your ships!";
 
   const socket = io();
 
   // get player number
   socket.on("player-number", (num) => {
     if (num === -1) {
-      infoDisplay.innerHTML = "Sunucu dolu. Lütfen daha sonra tekrar dene.";
+      infoDisplay.innerHTML = "Server is full. Please try again later.";
       socket.disconnect();
       setTimeout(() => location.reload(), 2500);
     } else {
@@ -101,24 +100,24 @@ function startMultiplayer() {
   startButton.addEventListener("click", () => {
     if (!allShipsPlaced) return;
     if (allShipsPlaced) startGameMulti(socket);
-    else infoDisplay.innerHTML = "Lütfen önce gemilerini yerleştir!";
+    else infoDisplay.innerHTML = "Place your ships first!";
   });
 
   // event listener for firing
   const boardBlocks = document.querySelectorAll("#computer div");
   socket.on("turn-change", (turn) => {
     turnNum = turn;
-    if (turnNum === playerNum) turnDisplay.innerHTML = "Senin sıran";
-    else turnDisplay.innerHTML = "Rakibin sırası";
+    if (turnNum === playerNum) turnDisplay.innerHTML = "Your turn";
+    else turnDisplay.innerHTML = "Enemy turn";
   });
   socket.on("gameover", (status) => {
     gameOver = status;
     if (gameOver) {
-      turnDisplay.textContent = "Oyun bitti!";
+      turnDisplay.textContent = "Game over!";
       gameInfo.append(reloadButton);
       reloadButton.onclick = () => location.reload();
       if (playerSunkShips.length !== 5)
-        infoDisplay.innerHTML = "Rakibin bütün gemilerini yok etti. Kaybettin!";
+        infoDisplay.innerHTML = "The enemy destroyed your ships. You lost!";
     }
   });
 
@@ -127,11 +126,11 @@ function startMultiplayer() {
       if (turnNum === playerNum) {
         if (gameOver) return;
         if (!allShipsPlaced) {
-          infoDisplay.innerHTML = "Lütfen önce gemilerini yerleştir!";
+          infoDisplay.innerHTML = "Place your ships first!";
           return;
         }
         if (!enemyReady) {
-          infoDisplay.innerHTML = "Lütfen rakibini bekle!";
+          infoDisplay.innerHTML = "Wait for your enemy!";
           return;
         }
         shotFired = handleClick(e);
@@ -140,7 +139,7 @@ function startMultiplayer() {
         socket.emit("turn-change", turnNum);
         socket.emit("fire", shotFired, turnNum);
         socket.emit("gameover", gameOver);
-      } else turnDisplay.innerHTML = "Rakibin sırası";
+      } else turnDisplay.innerHTML = "Enemy turn";
     });
   });
 
@@ -188,10 +187,10 @@ function startGameMulti(socket) {
 
   if (enemyReady) {
     if (currentPlayer === "player") {
-      turnDisplay.innerHTML = "Senin sıran";
+      turnDisplay.innerHTML = "Your turn";
     }
     if (currentPlayer === "enemy") {
-      turnDisplay.innerHTML = "Rakibin sırası";
+      turnDisplay.innerHTML = "Enemy turn";
     }
 
     const playerBoardData = Array.from(
@@ -217,8 +216,7 @@ function startSinglePlayer() {
   gameMode = "singleplayer";
   user = "computer";
   ships.forEach((ship) => addShip("computer", ship));
-  infoDisplay.innerHTML =
-    "Tek oyunculu oyun başladı! Lütfen gemilerini yerleştir.";
+  infoDisplay.innerHTML = "Singleplayer mode started, place your ships!";
   startButton.addEventListener("click", startGameSingle);
 }
 singlePlayerButton.addEventListener("click", startSinglePlayer);
@@ -314,7 +312,7 @@ function addShip(user, ship, startId) {
   );
 
   if (!isValid || !notTaken)
-    infoDisplay.innerHTML = "Gemini buraya yerleştiremezsin!";
+    infoDisplay.innerHTML = "You can't place your ship here!";
 
   if (isValid && notTaken) {
     infoDisplay.innerHTML = "";
@@ -398,7 +396,7 @@ function dragOver(e) {
 
 function dropShip(e) {
   if (!multiPlayerStarted && !singlePlayerStarted) {
-    infoDisplay.innerHTML = "Lütfen oyun modu seçiniz!";
+    infoDisplay.innerHTML = "Please select game mode!";
     return;
   }
   const startId = e.target.id;
@@ -437,15 +435,15 @@ let playerTurn;
 function startGameSingle() {
   if (playerTurn === undefined) {
     if (shipContainer.children.length !== 0) {
-      infoDisplay.textContent = "Lütfen önce gemilerini yerleştir!";
+      infoDisplay.textContent = "Place your ships first!";
     } else {
       const boardBlocks = document.querySelectorAll("#computer div");
       boardBlocks.forEach((block) =>
         block.addEventListener("click", handleClick)
       );
       playerTurn = true;
-      turnDisplay.textContent = "Senin sıran";
-      infoDisplay.textContent = "Oyun başladı!";
+      turnDisplay.textContent = "Your turn";
+      infoDisplay.textContent = "Game started!";
       gameControlButtons.classList.add("hidden");
     }
   }
@@ -457,7 +455,7 @@ function handleClick(e) {
     if (e.target.classList.contains("hit")) return;
     if (e.target.classList.contains("filled")) {
       e.target.classList.add("hit");
-      infoDisplay.textContent = "Bir gemiyi vurdun!";
+      infoDisplay.textContent = "You hit a ship!";
       const classes = Array.from(e.target.classList).filter(
         (name) => !["block", "hit", "filled", "unavailable"].includes(name)
       );
@@ -472,7 +470,7 @@ function handleClick(e) {
       }
     }
     if (!e.target.classList.contains("filled")) {
-      infoDisplay.textContent = "Iskaladın!";
+      infoDisplay.textContent = "You missed!";
       e.target.classList.add("miss");
     }
 
@@ -488,8 +486,8 @@ function handleClick(e) {
 // computers turn
 function computersTurn() {
   if (!gameOver) {
-    turnDisplay.textContent = "Bilgisayarın sırası";
-    infoDisplay.textContent = "Hesaplamalar yapılıyor..";
+    turnDisplay.textContent = "Computer turn";
+    infoDisplay.textContent = "Making calculations..";
 
     setTimeout(() => {
       const randomShot = Math.floor(Math.random() * 10 * 10);
@@ -504,14 +502,14 @@ function computersTurn() {
         !playerBoard[randomShot].classList.contains("hit")
       ) {
         playerBoard[randomShot].classList.add("hit");
-        infoDisplay.textContent = "Hedef vuruldu!";
+        infoDisplay.textContent = "Target hit!";
         const classes = Array.from(playerBoard[randomShot].classList).filter(
           (name) => !["block", "hit", "filled"].includes(name)
         );
         computerHits.push(...classes);
         checkScore("computer", computerHits, computerSunkShips);
       } else {
-        infoDisplay.textContent = "Iska!";
+        infoDisplay.textContent = "Miss!";
         playerBoard[randomShot].classList.add("miss");
       }
     }, 750);
@@ -522,8 +520,8 @@ function computersTurn() {
     handleEventListeners();
     setTimeout(() => {
       playerTurn = true;
-      turnDisplay.textContent = "Senin sıran";
-      infoDisplay.textContent = "Atışını yap!";
+      turnDisplay.textContent = "Your turn";
+      infoDisplay.textContent = "Take your shot!";
     }, 750);
   }
 }
@@ -542,12 +540,12 @@ function checkScore(user, userHits, userSunkShips) {
         user === "enemy" ||
         gameMode === "singleplayer"
       ) {
-        infoDisplay.textContent = `Rakibin ${shipName} gemisini batırdın!`;
+        infoDisplay.textContent = `You sunk enemy ${shipName}!`;
 
         playerHits = userHits.filter((hitShip) => hitShip !== shipName);
       }
       if (user === "computer") {
-        infoDisplay.textContent = `Rakip ${shipName} gemini batırdı!`;
+        infoDisplay.textContent = `Enemy sunk your ${shipName}!`;
         computerHits = userHits.filter((hitShip) => hitShip !== shipName);
       }
       userSunkShips.push(shipName);
@@ -559,7 +557,7 @@ function checkScore(user, userHits, userSunkShips) {
   checkShip("battleship", 4);
   checkShip("carrier", 5);
   if (playerSunkShips.length === 5) {
-    infoDisplay.textContent = "Rakibin bütün gemilerini yok ettin. Kazandın!"; // game over player 1 won
+    infoDisplay.textContent = "You destroyed all enemy ships, you won!"; // game over player 1 won
     gameOver = true;
     if (gameMode === "singleplayer") {
       startButton.removeEventListener("click", startGameSingle);
@@ -568,7 +566,8 @@ function checkScore(user, userHits, userSunkShips) {
     }
   }
   if (computerSunkShips.length === 5) {
-    infoDisplay.textContent = "Bütün gemilerin yok edildi. İyi savaştı amiral.";
+    infoDisplay.textContent =
+      "All of your ships has been destroyed. Well fought Admiral.";
     gameOver = true;
     startButton.removeEventListener("click", startGameSingle);
   }
