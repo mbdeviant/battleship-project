@@ -1,5 +1,5 @@
 import DisableDevtool from "disable-devtool";
-DisableDevtool();
+// DisableDevtool();
 
 const singlePlayerButton = document.getElementById("single-player-button");
 const multiplayerButton = document.getElementById("multiplayer-button");
@@ -117,7 +117,8 @@ function startMultiplayer() {
       gameInfo.append(reloadButton);
       reloadButton.onclick = () => location.reload();
       if (playerSunkShips.length !== 5)
-        infoDisplay.innerHTML = "The enemy destroyed your ships. You lost!";
+        infoDisplay.innerHTML =
+          "Your fleet has been destroyed, ces't la vie! Your time will come";
     }
   });
 
@@ -169,8 +170,10 @@ function startMultiplayer() {
     document
       .querySelector(`${player} .connected span`)
       .classList.toggle("green");
-    if (parseInt(num) === playerNum)
+    if (parseInt(num) === playerNum) {
+      document.querySelector(player).style.color = "tomato";
       document.querySelector(player).style.fontWeight = "bold";
+    }
   }
 }
 
@@ -187,10 +190,12 @@ function startGameMulti(socket) {
 
   if (enemyReady) {
     if (currentPlayer === "player") {
-      turnDisplay.innerHTML = "Your turn";
+      turnDisplay.innerHTML =
+        "Your enemy is ready to surrender to the beauty of the Sea. Take your shot";
     }
     if (currentPlayer === "enemy") {
-      turnDisplay.innerHTML = "Enemy turn";
+      turnDisplay.innerHTML =
+        "Do not look straight into her eyes or you will be tricked, wait for the sea";
     }
 
     const playerBoardData = Array.from(
@@ -557,7 +562,8 @@ function checkScore(user, userHits, userSunkShips) {
   checkShip("battleship", 4);
   checkShip("carrier", 5);
   if (playerSunkShips.length === 5) {
-    infoDisplay.textContent = "You destroyed all enemy ships, you won!"; // game over player 1 won
+    infoDisplay.textContent =
+      "You may have won this war but your enemy is happy to be buried in the Sea"; // game over player 1 won
     gameOver = true;
     if (gameMode === "singleplayer") {
       startButton.removeEventListener("click", startGameSingle);
