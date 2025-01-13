@@ -1,5 +1,5 @@
 import DisableDevtool from "disable-devtool";
-// DisableDevtool();
+DisableDevtool();
 
 const singlePlayerButton = document.getElementById("single-player-button");
 const multiplayerButton = document.getElementById("multiplayer-button");
