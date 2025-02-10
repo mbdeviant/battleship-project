@@ -117,8 +117,7 @@ function startMultiplayer() {
       gameInfo.append(reloadButton);
       reloadButton.onclick = () => location.reload();
       if (playerSunkShips.length !== 5)
-        infoDisplay.innerHTML =
-          "Your fleet has been destroyed, ces't la vie! Your time will come";
+        infoDisplay.innerHTML = "The enemy destroyed your ships. You lost!";
     }
   });
 
@@ -190,12 +189,10 @@ function startGameMulti(socket) {
 
   if (enemyReady) {
     if (currentPlayer === "player") {
-      turnDisplay.innerHTML =
-        "Your enemy is ready to surrender to the beauty of the Sea. Take your shot";
+      turnDisplay.innerHTML = "Your turn";
     }
     if (currentPlayer === "enemy") {
-      turnDisplay.innerHTML =
-        "Do not look straight into her eyes or you will be tricked, wait for the sea";
+      turnDisplay.innerHTML = "Enemy turn";
     }
 
     const playerBoardData = Array.from(
@@ -562,8 +559,7 @@ function checkScore(user, userHits, userSunkShips) {
   checkShip("battleship", 4);
   checkShip("carrier", 5);
   if (playerSunkShips.length === 5) {
-    infoDisplay.textContent =
-      "You may have won this war but your enemy is happy to be buried in the Sea"; // game over player 1 won
+    infoDisplay.textContent = "You destroyed all enemy ships, you won!";
     gameOver = true;
     if (gameMode === "singleplayer") {
       startButton.removeEventListener("click", startGameSingle);
